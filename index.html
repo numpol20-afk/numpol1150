@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>เช็คชื่อนักเรียน - หลายห้องเรียน</title>
+  <title>เช็คชื่อนักเรียน - ครบทุกฟีเจอร์</title>
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,19 +23,12 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap');
-    * { box-sizing: border-box; font-family: 'Noto+Sans Thai', sans-serif; }
-    body {
-      background: linear-gradient(0deg, #fce9e9 0%, #e0f4f1 26%, #ffffff 71%);
-      min-height: 100vh;
-      padding: 20px 10px;
-    }
-    .container-box {
-      background: #fff; padding: 1.8rem 1.2rem; border-radius: 0.6rem;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.15); max-width: 600px; margin: auto;
-    }
+    * { box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
+    body { background: linear-gradient(0deg, #fce9e9 0%, #e0f4f1 26%, #ffffff 71%); min-height: 100vh; padding: 20px 10px; }
+    .container-box { background: #fff; padding: 1.8rem 1.2rem; border-radius: 0.6rem; box-shadow: 0 3px 12px rgba(0,0,0,0.15); max-width: 600px; margin: auto; }
     .btn-check-all { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
     .student-row { font-size: 0.95rem; }
-    .student-row label { margin-bottom: 0; }
+    .student-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
     .note-box { background: #f8f9fa; border-radius: 0.375rem; padding: 0.75rem; }
     footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
     footer .fa { color: #fff740; }
@@ -46,63 +39,89 @@
   <div class="text-center mb-4">
     <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" style="width:180px;">
     <h2 class="mt-2">ระบบเช็คชื่อนักเรียน</h2>
-    <h5 class="text-danger">หลายชั้นเรียน • ครูสิทธิชาติ สิทธิ</h5>
+    <h5 class="text-danger">ครบทุกฟีเจอร์ • ครูสิทธิชาติ สิทธิ</h5>
   </div>
 
   <div class="container-box">
 
-    <!-- เลือกห้องเรียน -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-primary">เลือกห้องเรียน:</label>
-      <select id="classroom-select" class="form-select" required>
-        <option value="">-- เลือกห้อง --</option>
-      </select>
+    <!-- รหัสผ่านครู -->
+    <div class="mb-4" id="password-section">
+      <label class="form-label fw-bold text-danger">รหัสผ่านครู:</label>
+      <input type="password" id="teacher-password" class="form-control" placeholder="กรอกรหัสผ่านเพื่อใช้งาน">
+      <button id="login-btn" class="btn btn-primary mt-2 w-100">เข้าสู่ระบบ</button>
     </div>
 
-    <!-- เลือกคาบ -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
-      <select id="period-select" class="form-select" required>
-        <option value="">-- เลือกคาบ --</option>
-        <option value="คาบโฮมรูม">คาบโฮมรูม</option>
-        <option value="คาบ1">คาบ1</option>
-        <option value="คาบ2">คาบ2</option>
-        <option value="คาบ3">คาบ3</option>
-        <option value="คาบ4">คาบ4</option>
-        <option value="คาบ5">คาบ5</option>
-        <option value="คาบ6">คาบ6</option>
-        <option value="คาบ7">คาบ7</option>
-        <option value="คาบ8">คาบ8</option>
-      </select>
-    </div>
+    <!-- ฟอร์มหลัก (ซ่อนไว้ก่อน) -->
+    <div id="main-form" style="display: none;">
 
-    <!-- ปุ่มเลือกทั้งหมด -->
-    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-      <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
-      <button id="check-all-absent" class="btn btn-secondary btn-check-all">ขาดทั้งหมด</button>
-      <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
-      <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
-    </div>
+      <!-- เลือกห้องเรียน -->
+      <div class="mb-4">
+        <label class="form-label fw-bold text-primary">เลือกห้องเรียน:</label>
+        <select id="classroom-select" class="form-select" required>
+          <option value="">-- เลือกห้อง --</option>
+        </select>
+      </div>
 
-    <!-- รายชื่อนักเรียน -->
-    <div class="mb-3">
-      <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
-    </div>
-    <div id="student-list" class="mb-4"></div>
+      <!-- เลือกวิชา -->
+      <div class="mb-4">
+        <label class="form-label fw-bold text-primary">เลือกวิชา:</label>
+        <select id="subject-select" class="form-select" required>
+          <option value="">-- เลือกวิชา --</option>
+          <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+          <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+          <option value="ภาษาไทย">ภาษาไทย</option>
+          <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
+          <option value="สังคมศึกษา">สังคมศึกษา</option>
+          <option value="สุขศึกษา">สุขศึกษา</option>
+          <option value="ศิลปะ">ศิลปะ</option>
+          <option value="การงาน">การงาน</option>
+        </select>
+      </div>
 
-    <!-- หมายเหตุ -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-success">หมายเหตุเพิ่มเติม:</label>
-      <textarea id="note-input" class="form-control note-box" rows="3" 
-                placeholder="เช่น แจกใบงาน, สอบย่อย..."></textarea>
-    </div>
+      <!-- เลือกคาบ -->
+      <div class="mb-4">
+        <label class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
+        <select id="period-select" class="form-select" required>
+          <option value="">-- เลือกคาบ --</option>
+          <option value="คาบโฮมรูม">คาบโฮมรูม</option>
+          <option value="คาบ1">คาบ1</option>
+          <option value="คาบ2">คาบ2</option>
+          <option value="คาบ3">คาบ3</option>
+          <option value="คาบ4">คาบ4</option>
+          <option value="คาบ5">คาบ5</option>
+          <option value="คาบ6">คาบ6</option>
+          <option value="คาบ7">คาบ7</option>
+          <option value="คาบ8">คาบ8</option>
+        </select>
+      </div>
 
-    <!-- ปุ่ม -->
-    <div class="text-center">
-      <button id="save-btn" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
-    </div>
-    <div class="text-center mt-3">
-      <button id="send-summary" class="btn btn-success btn-lg px-5">แชร์ Flex Message</button>
+      <!-- ปุ่มเลือกทั้งหมด -->
+      <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
+        <button id="check-all-absent" class="btn btn-secondary btn-check-all">ขาดทั้งหมด</button>
+        <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
+        <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
+      </div>
+
+      <!-- รายชื่อนักเรียน -->
+      <div class="mb-3">
+        <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
+      </div>
+      <div id="student-list" class="mb-4"></div>
+
+      <!-- หมายเหตุ -->
+      <div class="mb-4">
+        <label class="form-label fw-bold text-success">หมายเหตุเพิ่มเติม:</label>
+        <textarea id="note-input" class="form-control note-box" rows="3" placeholder="เช่น แจกใบงาน, สอบย่อย..."></textarea>
+      </div>
+
+      <!-- ปุ่ม -->
+      <div class="text-center">
+        <button id="save-btn" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
+      </div>
+      <div class="text-center mt-3">
+        <button id="send-summary" class="btn btn-success btn-lg px-5">แชร์ Flex Message</button>
+      </div>
     </div>
   </div>
 
@@ -113,32 +132,41 @@
     let noteText = '';
     let selectedClassroom = '';
     let selectedPeriod = '';
+    let selectedSubject = '';
 
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec';
+    const TEACHER_PASSWORD = '123456'; // เปลี่ยนรหัสผ่านที่นี่
 
-    // สร้างห้องเรียน ม.1/1 ถึง ม.6/11
     const classrooms = [];
-    for (let grade = 1; grade <= 6; grade++) {
-      for (let room = 1; room <= 11; room++) {
-        classrooms.push(`ม.${grade}/${room}`);
-      }
-    }
+    for (let g = 1; g <= 6; g++) for (let r = 1; r <= 11; r++) classrooms.push(`ม.${g}/${r}`);
 
     window.onload = () => {
       liff.init({ liffId: '2008451449-Pvep2Jx2' })
         .then(() => {
           if (!liff.isLoggedIn()) liff.login();
-          else setupPage();
+          else setupLogin();
         })
         .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถเริ่มต้น LIFF', 'error'));
     };
 
-    function setupPage() {
+    function setupLogin() {
+      document.getElementById('login-btn').addEventListener('click', () => {
+        const pass = document.getElementById('teacher-password').value;
+        if (pass === TEACHER_PASSWORD) {
+          document.getElementById('password-section').style.display = 'none';
+          document.getElementById('main-form').style.display = 'block';
+          setupMainForm();
+        } else {
+          Swal.fire('รหัสผ่านผิด', 'กรุณากรอกรหัสผ่านให้ถูกต้อง', 'error');
+        }
+      });
+    }
+
+    function setupMainForm() {
       const select = document.getElementById('classroom-select');
       classrooms.forEach(c => {
         const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
+        opt.value = c; opt.textContent = c;
         select.appendChild(opt);
       });
 
@@ -176,12 +204,15 @@
     function generateStudentList(students) {
       const container = document.getElementById('student-list');
       container.innerHTML = '';
-      students.forEach((s, index) => {
+      students.forEach((s, i) => {
         const row = document.createElement('div');
-        row.className = 'row student-row mb-2 align-items-center';
-        const num = s.number || (index + 1);
+        row.className = 'row student-row mb-3 align-items-center';
+        const num = s.number || (i + 1);
         row.innerHTML = `
-          <div class="col-6"><label class="form-label mb-0">${num}. ${s.name}</label></div>
+          <div class="col-2 text-center">
+            ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}">` : '<div style="width:40px;height:40px;background:#ddd;border-radius:50%"></div>'}
+          </div>
+          <div class="col-4"><label class="form-label mb-0">${num}. ${s.name}</label></div>
           <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="มา" required> มา</label></div>
           <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ขาด" required> ขาด</label></div>
           <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ลา" required> ลา</label></div>
@@ -199,9 +230,10 @@
       attendanceRecords = [];
       selectedClassroom = document.getElementById('classroom-select').value;
       selectedPeriod = document.getElementById('period-select').value;
+      selectedSubject = document.getElementById('subject-select').value;
 
-      if (!selectedClassroom || !selectedPeriod) {
-        Swal.fire('กรุณาเลือกข้อมูล', 'โปรดเลือกทั้งห้องเรียนและคาบเรียน', 'warning');
+      if (!selectedClassroom || !selectedPeriod || !selectedSubject) {
+        Swal.fire('กรุณาเลือกข้อมูล', 'โปรดเลือก ห้องเรียน วิชา และคาบเรียน', 'warning');
         return;
       }
 
@@ -211,36 +243,32 @@
       let allSelected = true;
 
       rows.forEach(row => {
-        const label = row.querySelector('.form-label').innerText;
-        const name = label.replace(/^\d+\.\s*/, '').trim();
+        const name = row.querySelector('.form-label').innerText.replace(/^\d+\.\s*/, '').trim();
         const checked = row.querySelector('input:checked');
+        const img = row.querySelector('img');
+        const imageUrl = img ? img.src : '';
         if (checked) {
           attendanceRecords.push({
             name, status: checked.value, period: selectedPeriod,
-            classroom: selectedClassroom, note: noteText
+            subject: selectedSubject, classroom: selectedClassroom,
+            note: noteText, imageUrl: imageUrl
           });
-        } else {
-          allSelected = false;
-        }
+        } else allSelected = false;
       });
 
       if (!allSelected) {
-        Swal.fire('กรุณาระบุสถานะทุกคน', 'โปรดเลือกสถานะของนักเรียนทุกคนก่อนบันทึก', 'error');
+        Swal.fire('กรุณาระบุสถานะทุกคน', 'โปรดเลือกสถานะของนักเรียนทุกคน', 'error');
         return;
       }
 
       $.LoadingOverlay("show");
       $.post(scriptUrl, JSON.stringify(attendanceRecords), data => {
         $.LoadingOverlay("hide");
-        if (data.status === 'success') {
-          Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-          document.getElementById('note-input').value = '';
-        } else {
-          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
-        }
+        Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
+        document.getElementById('note-input').value = '';
       }).fail(() => {
         $.LoadingOverlay("hide");
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+        Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
       });
     }
 
@@ -252,7 +280,7 @@
 
     function sendSummary() {
       if (attendanceRecords.length === 0) {
-        Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกข้อมูลก่อนแชร์', 'error');
+        Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกก่อนแชร์', 'error');
         return;
       }
 
@@ -264,7 +292,7 @@
 
       const flexMessage = {
         type: 'flex',
-        altText: `สรุป ${selectedClassroom} ${selectedPeriod}`,
+        altText: `สรุป ${selectedClassroom} ${selectedSubject} ${selectedPeriod}`,
         contents: {
           type: 'bubble',
           size: 'giga',
@@ -273,7 +301,7 @@
             layout: 'vertical',
             contents: [
               { type: 'text', text: `สรุปการเข้าเรียน ${selectedClassroom}`, weight: 'bold', size: 'xl', color: '#1DB446' },
-              { type: 'text', text: `${dateStr} • ${selectedPeriod}`, size: 'sm', color: '#888888' }
+              { type: 'text', text: `${dateStr} • ${selectedSubject} • ${selectedPeriod}`, size: 'sm', color: '#888888' }
             ]
           },
           body: {
@@ -330,354 +358,10 @@
 
       liff.shareTargetPicker([flexMessage])
         .then(res => {
-          Swal.fire(res ? 'สำเร็จ' : 'ยกเลิก', res ? 'แชร์เรียบร้อย' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
+          Swal.fire(res ? 'สำเร็จ' : 'ยกเลิก', res ? 'แชร์แล้ว' : 'ยกเลิก', res ? 'success' : 'info');
           if (res) liff.closeWindow();
         })
-        .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error'));
-    }
-  </script>
-
-  <footer>
-    <p>พัฒนาโดย ครูสิทธิชาติ สิทธิ</p>
-  </footer>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>เช็คชื่อนักเรียน - หลายห้องเรียน</title>
-
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- Loading Overlay -->
-  <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap');
-    * { box-sizing: border-box; font-family: 'Noto+Sans Thai', sans-serif; }
-    body {
-      background: linear-gradient(0deg, #fce9e9 0%, #e0f4f1 26%, #ffffff 71%);
-      min-height: 100vh;
-      padding: 20px 10px;
-    }
-    .container-box {
-      background: #fff; padding: 1.8rem 1.2rem; border-radius: 0.6rem;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.15); max-width: 600px; margin: auto;
-    }
-    .btn-check-all { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
-    .student-row { font-size: 0.95rem; }
-    .student-row label { margin-bottom: 0; }
-    .note-box { background: #f8f9fa; border-radius: 0.375rem; padding: 0.75rem; }
-    footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
-    footer .fa { color: #fff740; }
-  </style>
-</head>
-<body>
-
-  <div class="text-center mb-4">
-    <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" style="width:180px;">
-    <h2 class="mt-2">ระบบเช็คชื่อนักเรียน</h2>
-    <h5 class="text-danger">หลายชั้นเรียน • ครูสิทธิชาติ สิทธิ</h5>
-  </div>
-
-  <div class="container-box">
-
-    <!-- เลือกห้องเรียน -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-primary">เลือกห้องเรียน:</label>
-      <select id="classroom-select" class="form-select" required>
-        <option value="">-- เลือกห้อง --</option>
-      </select>
-    </div>
-
-    <!-- เลือกคาบ -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
-      <select id="period-select" class="form-select" required>
-        <option value="">-- เลือกคาบ --</option>
-        <option value="คาบโฮมรูม">คาบโฮมรูม</option>
-        <option value="คาบ1">คาบ1</option>
-        <option value="คาบ2">คาบ2</option>
-        <option value="คาบ3">คาบ3</option>
-        <option value="คาบ4">คาบ4</option>
-        <option value="คาบ5">คาบ5</option>
-        <option value="คาบ6">คาบ6</option>
-        <option value="คาบ7">คาบ7</option>
-        <option value="คาบ8">คาบ8</option>
-      </select>
-    </div>
-
-    <!-- ปุ่มเลือกทั้งหมด -->
-    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-      <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
-      <button id="check-all-absent" class="btn btn-secondary btn-check-all">ขาดทั้งหมด</button>
-      <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
-      <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
-    </div>
-
-    <!-- รายชื่อนักเรียน -->
-    <div class="mb-3">
-      <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
-    </div>
-    <div id="student-list" class="mb-4"></div>
-
-    <!-- หมายเหตุ -->
-    <div class="mb-4">
-      <label class="form-label fw-bold text-success">หมายเหตุเพิ่มเติม:</label>
-      <textarea id="note-input" class="form-control note-box" rows="3" 
-                placeholder="เช่น แจกใบงาน, สอบย่อย..."></textarea>
-    </div>
-
-    <!-- ปุ่ม -->
-    <div class="text-center">
-      <button id="save-btn" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
-    </div>
-    <div class="text-center mt-3">
-      <button id="send-summary" class="btn btn-success btn-lg px-5">แชร์ Flex Message</button>
-    </div>
-  </div>
-
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
-  <script>
-    let attendanceRecords = [];
-    let noteText = '';
-    let selectedClassroom = '';
-    let selectedPeriod = '';
-
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec';
-
-    // สร้างห้องเรียน ม.1/1 ถึง ม.6/11
-    const classrooms = [];
-    for (let grade = 1; grade <= 6; grade++) {
-      for (let room = 1; room <= 11; room++) {
-        classrooms.push(`ม.${grade}/${room}`);
-      }
-    }
-
-    window.onload = () => {
-      liff.init({ liffId: '2008451449-Pvep2Jx2' })
-        .then(() => {
-          if (!liff.isLoggedIn()) liff.login();
-          else setupPage();
-        })
-        .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถเริ่มต้น LIFF', 'error'));
-    };
-
-    function setupPage() {
-      const select = document.getElementById('classroom-select');
-      classrooms.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-      });
-
-      select.addEventListener('change', () => {
-        selectedClassroom = select.value;
-        if (selectedClassroom) loadStudents(selectedClassroom);
-        else document.getElementById('student-list').innerHTML = '';
-      });
-
-      document.getElementById('save-btn').addEventListener('click', saveAttendance);
-      document.getElementById('send-summary').addEventListener('click', sendSummary);
-
-      ['present', 'absent', 'leave', 'late'].forEach(type => {
-        document.getElementById(`check-all-${type}`).addEventListener('click', () => {
-          const status = type === 'present' ? 'มา' : type === 'absent' ? 'ขาด' : type === 'leave' ? 'ลา' : 'สาย';
-          checkAll(status);
-        });
-      });
-    }
-
-    function loadStudents(classroom) {
-      $.LoadingOverlay("show");
-      fetch(`${scriptUrl}?classroom=${encodeURIComponent(classroom)}`)
-        .then(r => r.json())
-        .then(data => {
-          generateStudentList(data);
-          $.LoadingOverlay("hide");
-        })
-        .catch(() => {
-          $.LoadingOverlay("hide");
-          Swal.fire('ผิดพลาด', 'ไม่สามารถดึงรายชื่อได้', 'error');
-        });
-    }
-
-    function generateStudentList(students) {
-      const container = document.getElementById('student-list');
-      container.innerHTML = '';
-      students.forEach((s, index) => {
-        const row = document.createElement('div');
-        row.className = 'row student-row mb-2 align-items-center';
-        const num = s.number || (index + 1);
-        row.innerHTML = `
-          <div class="col-6"><label class="form-label mb-0">${num}. ${s.name}</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="มา" required> มา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ขาด" required> ขาด</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ลา" required> ลา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="สาย" required> สาย</label></div>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function checkAll(status) {
-      document.querySelectorAll(`input[value="${status}"]`).forEach(r => r.checked = true);
-    }
-
-    function saveAttendance() {
-      attendanceRecords = [];
-      selectedClassroom = document.getElementById('classroom-select').value;
-      selectedPeriod = document.getElementById('period-select').value;
-
-      if (!selectedClassroom || !selectedPeriod) {
-        Swal.fire('กรุณาเลือกข้อมูล', 'โปรดเลือกทั้งห้องเรียนและคาบเรียน', 'warning');
-        return;
-      }
-
-      noteText = document.getElementById('note-input').value.trim();
-
-      const rows = document.querySelectorAll('#student-list .row');
-      let allSelected = true;
-
-      rows.forEach(row => {
-        const label = row.querySelector('.form-label').innerText;
-        const name = label.replace(/^\d+\.\s*/, '').trim();
-        const checked = row.querySelector('input:checked');
-        if (checked) {
-          attendanceRecords.push({
-            name, status: checked.value, period: selectedPeriod,
-            classroom: selectedClassroom, note: noteText
-          });
-        } else {
-          allSelected = false;
-        }
-      });
-
-      if (!allSelected) {
-        Swal.fire('กรุณาระบุสถานะทุกคน', 'โปรดเลือกสถานะของนักเรียนทุกคนก่อนบันทึก', 'error');
-        return;
-      }
-
-      $.LoadingOverlay("show");
-      $.post(scriptUrl, JSON.stringify(attendanceRecords), data => {
-        $.LoadingOverlay("hide");
-        if (data.status === 'success') {
-          Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-          document.getElementById('note-input').value = '';
-        } else {
-          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
-        }
-      }).fail(() => {
-        $.LoadingOverlay("hide");
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-      });
-    }
-
-    function formatThaiDate(d) {
-      const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
-    }
-
-    function sendSummary() {
-      if (attendanceRecords.length === 0) {
-        Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกข้อมูลก่อนแชร์', 'error');
-        return;
-      }
-
-      const total = attendanceRecords.length;
-      const stats = { มา: 0, ขาด: 0, ลา: 0, สาย: 0 };
-      attendanceRecords.forEach(r => stats[r.status]++);
-
-      const dateStr = formatThaiDate(new Date());
-
-      const flexMessage = {
-        type: 'flex',
-        altText: `สรุป ${selectedClassroom} ${selectedPeriod}`,
-        contents: {
-          type: 'bubble',
-          size: 'giga',
-          header: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              { type: 'text', text: `สรุปการเข้าเรียน ${selectedClassroom}`, weight: 'bold', size: 'xl', color: '#1DB446' },
-              { type: 'text', text: `${dateStr} • ${selectedPeriod}`, size: 'sm', color: '#888888' }
-            ]
-          },
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              { type: 'separator', margin: 'md' },
-              {
-                type: 'box',
-                layout: 'vertical',
-                margin: 'md',
-                spacing: 'sm',
-                contents: attendanceRecords.map(r => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: r.name, size: 'md', color: '#555555', flex: 4 },
-                    { type: 'text', text: r.status, size: 'md', align: 'end', flex: 2,
-                      color: r.status === 'มา' ? '#1DB446' : r.status === 'ขาด' ? '#FF5555' : r.status === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
-              },
-              { type: 'separator', margin: 'lg' },
-              {
-                type: 'box',
-                layout: 'vertical',
-                margin: 'lg',
-                spacing: 'xs',
-                contents: Object.entries(stats).map(([s, c]) => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: `${s}:`, size: 'md', flex: 3,
-                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
-                    },
-                    { type: 'text', text: `${c} คน (${((c/total)*100).toFixed(1)}%)`, size: 'md', flex: 2, align: 'end',
-                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
-              },
-              ...(noteText ? [
-                { type: 'separator', margin: 'lg' },
-                { type: 'box', layout: 'vertical', margin: 'lg', contents: [
-                  { type: 'text', text: 'หมายเหตุ', size: 'sm', color: '#888888', weight: 'bold' },
-                  { type: 'text', text: noteText, size: 'md', color: '#333333', wrap: true }
-                ]}
-              ] : [])
-            ]
-          }
-        }
-      };
-
-      liff.shareTargetPicker([flexMessage])
-        .then(res => {
-          Swal.fire(res ? 'สำเร็จ' : 'ยกเลิก', res ? 'แชร์เรียบร้อย' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
-          if (res) liff.closeWindow();
-        })
-        .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error'));
+        .catch(() => Swal.fire('ผิดพลาด', 'แชร์ไม่ได้', 'error'));
     }
   </script>
 
