@@ -143,9 +143,10 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <script>
-    // ตัวแปร
+    // ตัวแปร global
     let attendanceRecords = [];
     let noteText = '';
+    window.selectedPeriod = '';  // เก็บคาบที่เลือกไว้ (สำคัญ!)
     const studentListUrl = 'https://opensheet.elk.sh/1Nrp7mvXCZaA-0PbbwCXeStW7WlmpgT0pDVobTA1l7g0/Name';
 
     // เริ่มต้น
@@ -221,11 +222,15 @@
       attendanceRecords = [];
       let allFilled = true;
 
+      // ดึงคาบก่อนรีเซ็ตฟอร์ม
       const period = document.getElementById('period-select').value;
       if (!period) {
         Swal.fire('กรุณาเลือกคาบ', 'โปรดเลือกคาบเรียนก่อนบันทึก', 'warning');
         return;
       }
+
+      // เก็บคาบไว้ใช้ใน Flex Message
+      window.selectedPeriod = period;
 
       noteText = document.getElementById('note-input').value.trim();
 
@@ -282,7 +287,9 @@
         return;
       }
 
-      const period = document.getElementById('period-select').value || 'ไม่ระบุคาบ';
+      // ใช้ window.selectedPeriod ที่เก็บไว้ตอนบันทึก
+      const period = window.selectedPeriod || 'ไม่ระบุคาบ';
+
       const total = attendanceRecords.length;
       const stats = { มา: 0, ขาด: 0, ลา: 0, สาย: 0 };
       attendanceRecords.forEach(r => stats[r.status]++);
@@ -343,7 +350,6 @@
                   ]
                 }))
               },
-              // หมายเหตุ
               ...(noteText ? [
                 { type: 'separator', margin: 'lg' },
                 {
@@ -375,7 +381,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>พัฒนาโดย <i class="fa fa-heart"></i> ครูสิทธิชาติ สิทธิ</p>
+    <p>พัฒนาโดย ครูสิทธิชาติ สิทธิ</p>
   </footer>
 
 </body>
