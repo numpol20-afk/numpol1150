@@ -26,7 +26,11 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
+      background: rgb(252, 233, 233);
       background: linear-gradient(0deg, rgba(252, 233, 233, 1) 0%, rgba(224, 244, 241, 1) 26%, rgba(255, 255, 255, 1) 71%);
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
       flex-direction: column;
     }
     .list {
@@ -34,19 +38,23 @@
       padding: 1.8em 1.2em;
       box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
       border-radius: 0.6em;
-      width: 100%;
-      max-width: 600px;
     }
     footer {
-      margin-top: 20px;
+      margin-top: 10px;
       background-color: #000;
       width: 100%;
-      padding: 8px;
+      padding: 2px;
       position: fixed;
       bottom: 0;
-      text-align: center;
     }
-    footer .fa { color: #fff740; }
+    footer p,
+    footer a {
+      text-decoration: none;
+      margin: 0;
+    }
+    footer .fa {
+      color: #fff740;
+    }
   </style>
 </head>
 <body>
@@ -55,48 +63,42 @@
     <h2>Student Attendance Apps</h2>
     <h5 class="text-center text-danger">สื่อ และนวัตกรรมครูสิทธิชาติ สิทธิ</h5>
   </center>
-
   <main class="container">
-    <div class="list">
-      <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
-        <button id="check-all-present" class="btn btn-primary btn-sm">มาทั้งหมด</button>
-        <button id="check-all-absent" class="btn btn-secondary btn-sm">ขาดทั้งหมด</button>
-        <button id="check-all-leave" class="btn btn-warning btn-sm">ลาทั้งหมด</button>
-        <button id="check-all-late" class="btn btn-danger btn-sm">สายทั้งหมด</button>
+    <div class="container list">
+      <div class="d-flex justify-content-center mb-3">
+        <button id="check-all-present" class="btn btn-primary me-2">มาทั้งหมด</button>
+        <button id="check-all-absent" class="btn btn-secondary">ขาดทั้งหมด</button>
+        <button id="check-all-leave" class="btn btn-warning ms-2">ลาทั้งหมด</button>
+        <button id="check-all-late" class="btn btn-danger ms-2">สายทั้งหมด</button>
       </div>
-
       <form id="attendance-form" class="mt-4">
 
-        <!-- Dropdown เลือกคาบ -->
-        <div class="mb-3">
-          <label for="period-select" class="form-label fw-bold">เลือกคาบเรียน:</label>
-          <select id="period-select" class="form-select" required>
-            <option value="">-- เลือกคาบ --</option>
-            <option value="คาบโฮมรูม">คาบโฮมรูม</option>
-            <option value="คาบ1">คาบ1</option>
-            <option value="คาบ2">คาบ2</option>
-            <option value="คาบ3">คาบ3</option>
-            <option value="คาบ4">คาบ4</option>
-            <option value="คาบ5">คาบ5</option>
-            <option value="คาบ6">คาบ6</option>
-            <option value="คาบ7">คาบ7</option>
-            <option value="คาบ8">คาบ8</option>
-          </select>
+        <!-- เพิ่ม Dropdown เลือกคาบ -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="period-select" class="form-label">เลือกคาบเรียน:</label>
+            <select id="period-select" class="form-select" required>
+              <option value="">-- เลือกคาบ --</option>
+              <option value="คาบโฮมรูม">คาบโฮมรูม</option>
+              <option value="คาบ1">คาบ1</option>
+              <option value="คาบ2">คาบ2</option>
+              <option value="คาบ3">คาบ3</option>
+              <option value="คาบ4">คาบ4</option>
+              <option value="คาบ5">คาบ5</option>
+              <option value="คาบ6">คาบ6</option>
+              <option value="คาบ7">คาบ7</option>
+              <option value="คาบ8">คาบ8</option>
+            </select>
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
+        <div class="row mb-3">
+          <label class="col-form-label">รายชื่อนักเรียน:</label>
         </div>
         <div id="student-list"></div>
-
-        <center>
-          <button type="submit" class="btn btn-primary mt-3">บันทึกข้อมูล</button>
-        </center>
+        <center><button type="submit" class="btn btn-primary mt-3">บันทึกข้อมูล</button></center>
       </form>
-
-      <center>
-        <button id="send-summary" class="btn btn-success mt-3">แชร์ Flex Message</button>
-      </center>
+      <center><button id="send-summary" class="btn btn-success mt-3">แชร์ Flex message</button></center>
     </div>
   </main>
 
@@ -113,109 +115,121 @@
           } else {
             console.log('LIFF initialized');
             fetchStudentList();
-            setupEventListeners();
+            document.getElementById('attendance-form').addEventListener('submit', addAttendanceRecord);
+            document.getElementById('send-summary').addEventListener('click', sendSummary);
+            document.getElementById('check-all-present').addEventListener('click', () => checkAll('มา'));
+            document.getElementById('check-all-absent').addEventListener('click', () => checkAll('ขาด'));
+            document.getElementById('check-all-leave').addEventListener('click', () => checkAll('ลา'));
+            document.getElementById('check-all-late').addEventListener('click', () => checkAll('สาย'));
           }
         })
-        .catch(err => {
-          console.error('LIFF Error:', err);
-          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเริ่มต้น LIFF ได้', 'error');
+        .catch((err) => {
+          console.error('Error initializing LIFF: ', err);
+          Swal.fire('Error', 'Failed to initialize LIFF: ' + err, 'error');
         });
     };
 
-    function setupEventListeners() {
-      document.getElementById('attendance-form').addEventListener('submit', addAttendanceRecord);
-      document.getElementById('send-summary').addEventListener('click', sendSummary);
-      document.getElementById('check-all-present').addEventListener('click', () => checkAll('มา'));
-      document.getElementById('check-all-absent').addEventListener('click', () => checkAll('ขาด'));
-      document.getElementById('check-all-leave').addEventListener('click', () => checkAll('ลา'));
-      document.getElementById('check-all-late').addEventListener('click', () => checkAll('สาย'));
-    }
-
     function fetchStudentList() {
-      fetch(student  studentListUrl)
-        .then(r => r.json())
+      fetch(studentListUrl)
+        .then(response => response.json())
         .then(data => generateStudentList(data))
-        .catch(err => {
-          console.error('Fetch error:', err);
-          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงรายชื่อนักเรียนได้', 'error');
+        .catch(error => {
+          console.error('Error fetching student list: ', error);
+          Swal.fire('Error', 'Failed to fetch student list: ' + error, 'error');
         });
     }
 
     function generateStudentList(students) {
-      const container = document.getElementById('student-list');
-      container.innerHTML = '';
-      students.forEach(s => {
-        const row = document.createElement('div');
-        row.className = 'row mb-2 align-items-center';
-        const num = s['เลขที่'];
-        const name = s['รายชื่อนักเรียน'];
-        row.innerHTML = `
+      const studentList = document.getElementById('student-list');
+      studentList.innerHTML = ''; // ล้างก่อน
+      students.forEach(student => {
+        const studentRow = document.createElement('div');
+        studentRow.className = 'row mb-3';
+        const number = student['เลขที่'];
+        const name = student['รายชื่อนักเรียน'];
+        studentRow.innerHTML = `
           <div class="col-6">
-            <label class="form-label mb-0">${num}. ${name}</label>
+            <label class="form-label">${number}. ${name}</label>
           </div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="มา" required> มา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ขาด"> ขาด</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="ลา"> ลา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${num}" value="สาย"> สาย</label></div>
+          <div class="col-1">
+            <label><input type="radio" name="student${number}" value="มา" required> มา</label>
+          </div>
+          <div class="col-1">
+            <label><input type="radio" name="student${number}" value="ขาด" required> ขาด</label>
+          </div>
+          <div class="col-1">
+            <label><input type="radio" name="student${number}" value="ลา" required> ลา</label>
+          </div>
+          <div class="col-1">
+            <label><input type="radio" name="student${number}" value="สาย" required> สาย</label>
+          </div>
         `;
-        container.appendChild(row);
+        studentList.appendChild(studentRow);
       });
     }
 
     function checkAll(status) {
-      document.querySelectorAll(`input[value="${status}"]`).forEach(r => r.checked = true);
+      const radios = document.querySelectorAll(`input[value="${status}"]`);
+      radios.forEach(radio => radio.checked = true);
     }
 
-    function addAttendanceRecord(e) {
-      e.preventDefault();
+    function addAttendanceRecord(event) {
+      event.preventDefault();
       attendanceRecords = [];
-      let allFilled = true;
+      let allSelected = true;
 
-      const period = document.getElementById('period-select').value;
-      if (!period) {
+      // ดึงคาบที่เลือก
+      const selectedPeriod = document.getElementById('period-select').value;
+      if (!selectedPeriod) {
         Swal.fire('กรุณาเลือกคาบ', 'โปรดเลือกคาบเรียนก่อนบันทึก', 'warning');
         return;
       }
 
-      document.querySelectorAll('#student-list .row').forEach(row => {
+      const studentList = document.getElementById('student-list');
+      const studentRows = studentList.querySelectorAll('.row');
+      studentRows.forEach(row => {
         const label = row.querySelector('.form-label').innerText;
-        const name = label.replace(/^\d+\.\s*/, '').trim();
-        const checked = row.querySelector('input:checked');
-        if (checked) {
-          attendanceRecords.push({ name, status: checked.value, period });
+        const name = label.replace(/^\d+\.\s*/, '').trim(); // ลบเลขที่
+        const statusInput = row.querySelector('input:checked');
+        if (statusInput) {
+          attendanceRecords.push({
+            name: name,
+            status: statusInput.value,
+            period: selectedPeriod
+          });
         } else {
-          allFilled = false;
+          allSelected = false;
         }
       });
 
-      if (allFilled) {
+      if (allSelected) {
         saveToSheet(attendanceRecords);
         document.getElementById('attendance-form').reset();
         document.getElementById('period-select').selectedIndex = 0;
       } else {
-        Swal.fire('กรุณาเลือกสถานะทุกคน', 'โปรดระบุสถานะของนักเรียนทุกคน', 'error');
+        Swal.fire('ผิดพลาด', 'กรุณาเลือกสถานะของนักเรียนทุกคน!', 'error');
       }
     }
 
     function saveToSheet(records) {
       $.LoadingOverlay("show");
       const url = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม Web App URL ของคุณ
-      $.post(url, JSON.stringify(records), data => {
+      $.post(url, JSON.stringify(records), function(data) {
         $.LoadingOverlay("hide");
         if (data.status === 'success') {
-          Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+          Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย!', 'success');
         } else {
-          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
+          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ!', 'error');
         }
-      }).fail(() => {
+      }).fail(function() {
         $.LoadingOverlay("hide");
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+        Swal.fire('ผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้!', 'error');
       });
     }
 
     function formatThaiDate(date) {
-      const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
       return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
     }
 
@@ -225,20 +239,19 @@
         return;
       }
 
-      const period = document.getElementById('period-select').value || 'ไม่ระบุคาบ';
+      const selectedPeriod = document.getElementById('period-select').value || 'ไม่ระบุคาบ';
+      const presentCount = attendanceRecords.filter(r => r.status === 'มา').length;
+      const absentCount = attendanceRecords.filter(r => r.status === 'ขาด').length;
+      const leaveCount = attendanceRecords.filter(r => r.status === 'ลา').length;
+      const lateCount = attendanceRecords.filter(r => r.status === 'สาย').length;
       const total = attendanceRecords.length;
-      const stats = {
-        มา: attendanceRecords.filter(r => r.status === 'มา').length,
-        ขาด: attendanceRecords.filter(r => r.status === 'ขาด').length,
-        ลา: attendanceRecords.filter(r => r.status === 'ลา').length,
-        สาย: attendanceRecords.filter(r => r.status === 'สาย').length
-      };
 
-      const dateStr = formatThaiDate(new Date());
+      const now = new Date();
+      const dateStr = formatThaiDate(now);
 
       const flexMessage = {
         type: 'flex',
-        altText: `สรุปการเข้าเรียน ${period}`,
+        altText: 'สรุปการเข้าเรียน',
         contents: {
           type: 'bubble',
           size: 'giga',
@@ -246,55 +259,47 @@
             type: 'box',
             layout: 'vertical',
             contents: [
-              { type: 'text', text: 'สรุปการเข้าเรียน ม.3/7', weight: 'bold', size: 'xl', color: '#1DB446', margin: 'md' },
-              { type: 'text', text: `${dateStr} • ${period}`, size: 'sm', color: '#888888', margin: 'sm' }
+              { type: 'text', text: 'สรุปการเข้าเรียน ม.3/7', weight: 'bold', size: 'xl', color: '#1DB446' },
+              { type: 'text', text: `วันที่ ${dateStr} • ${selectedPeriod}`, size: 'sm', color: '#888888', margin: 'md' }
             ]
           },
           body: {
             type: 'box',
             layout: 'vertical',
             contents: [
-              { type: 'separator', margin: 'md' },
-              {
+              ...attendanceRecords.map(r => ({
                 type: 'box',
-                layout: 'vertical',
-                margin: 'md',
-                spacing: 'sm',
-                contents: attendanceRecords.map(r => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: r.name, size: 'md', color: '#555555', flex: 4 },
-                    { type: 'text', text: r.status, size: 'md', align: 'end', flex: 2,
-                      color: r.status === 'มา' ? '#1DB446' :
-                             r.status === 'ขาด' ? '#FF5555' :
-                             r.status === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
-              },
+                layout: 'horizontal',
+                contents: [
+                  { type: 'text', text: r.name, flex: 4, size: 'md', color: '#555555' },
+                  { type: 'text', text: r.status, flex: 2, size: 'md', align: 'end',
+                    color: r.status === 'มา' ? '#1DB446' : (r.status === 'ขาด' ? '#FF5555' : (r.status === 'ลา' ? '#FFC107' : '#FF8800'))
+                  }
+                ]
+              })),
               { type: 'separator', margin: 'lg' },
               {
                 type: 'box',
                 layout: 'vertical',
                 margin: 'lg',
-                spacing: 'xs',
-                contents: Object.entries(stats).map(([status, count]) => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: `${status}:`, size: 'md', flex: 3,
-                      color: status === 'มา' ? '#1DB446' :
-                             status === 'ขาด' ? '#FF5555' :
-                             status === 'ลา' ? '#FFC107' : '#FF8800'
-                    },
-                    { type: 'text', text: `${count} คน (${((count/total)*100).toFixed(1)}%)`, size: 'md', flex: 2, align: 'end',
-                      color: status === 'มา' ? '#1DB446' :
-                             status === 'ขาด' ? '#FF5555' :
-                             status === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
+                contents: [
+                  { type: 'box', layout: 'horizontal', contents: [
+                    { type: 'text', text: 'มาเรียน:', flex: 3, color: '#1DB446' },
+                    { type: 'text', text: `${presentCount} คน (${((presentCount/total)*100).toFixed(1)}%)`, flex: 2, align: 'end', color: '#1DB446' }
+                  ]},
+                  { type: 'box', layout: 'horizontal', contents: [
+                    { type: 'text', text: 'ขาด:', flex: 3, color: '#FF5555' },
+                    { type: 'text', text: `${absentCount} คน (${((absentCount/total)*100).toFixed(1)}%)`, flex: 2, align: 'end', color: '#FF5555' }
+                  ]},
+                  { type: 'box', layout: 'horizontal', contents: [
+                    { type: 'text', text: 'ลา:', flex: 3, color: '#FFC107' },
+                    { type: 'text', text: `${leaveCount} คน (${((leaveCount/total)*100).toFixed(1)}%)`, flex: 2, align: 'end', color: '#FFC107' }
+                  ]},
+                  { type: 'box', layout: 'horizontal', contents: [
+                    { type: 'text', text: 'สาย:', flex: 3, color: '#FF8800' },
+                    { type: 'text', text: `${lateCount} คน (${((lateCount/total)*100).toFixed(1)}%)`, flex: 2, align: 'end', color: '#FF8800' }
+                  ]}
+                ]
               }
             ]
           }
@@ -303,18 +308,18 @@
 
       liff.shareTargetPicker([flexMessage])
         .then(res => {
-          Swal.fire('สำเร็จ', res ? 'แชร์เรียบร้อยแล้ว' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
+          Swal.fire('สำเร็จ', res ? 'แชร์เรียบร้อย' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
           if (res) liff.closeWindow();
         })
         .catch(err => {
           console.error(err);
-          Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error');
+          Swal.fire('ผิดพลาด', 'แชร์ไม่สำเร็จ', 'error');
         });
     }
   </script>
 
-  <footer>
-    <p>พัฒนาโดย ครูสิทธิชาติ สิทธิ</p>
+  <footer class="text-center text-lg-start bg-light text-muted" style="position: static; left: 0; bottom: 0; width: 100%;">
+    <div class="footer-container"></div>
   </footer>
 </body>
 </html>
