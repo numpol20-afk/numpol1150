@@ -1,152 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Student Attendance Check</title>
-  <!-- Bootstrap CSS -->
+  <title>เช็คชื่อนักเรียน - ครูสิทธิชาติ</title>
+
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
   <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <!-- Sweet Alert -->
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Loading Overlay -->
   <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai');
-    * {
-      box-sizing: border-box;
-      font-family: 'Noto Sans Thai', sans-serif;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap');
+    * { box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
     body {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
+      background: linear-gradient(0deg, #fce9e9 0%, #e0f4f1 26%, #ffffff 71%);
       min-height: 100vh;
-      background: linear-gradient(0deg, rgba(252, 233, 233, 1) 0%, rgba(224, 244, 241, 1) 26%, rgba(255, 255, 255, 1) 71%);
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
     }
-    .list {
-      background-color: #ffffff;
-      padding: 1.8em 1.2em;
-      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-      border-radius: 0.6em;
+    .container-box {
+      background: #fff;
+      padding: 1.8rem 1.2rem;
+      border-radius: 0.6rem;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
       width: 100%;
       max-width: 600px;
     }
+    .btn-check-all {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.6rem;
+    }
+    .student-row {
+      font-size: 0.95rem;
+    }
+    .student-row label {
+      margin-bottom: 0;
+      font-weight: normal;
+    }
+    .note-box {
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      padding: 0.75rem;
+      background-color: #f8f9fa;
+    }
     footer {
-      margin-top: 20px;
-      background-color: #000;
+      margin-top: 30px;
+      background: #000;
+      color: #fff;
       width: 100%;
-      padding: 8px;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9rem;
       position: fixed;
       bottom: 0;
-      text-align: center;
+      left: 0;
     }
     footer .fa { color: #fff740; }
   </style>
 </head>
 <body>
-  <center class="mb-4">
-    <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" class="mt-4" style="width:200px; height:auto; padding-bottom: 10px;">
-    <h2>Student Attendance Apps</h2>
-    <h5 class="text-center text-danger">สื่อ และนวัตกรรมครูสิทธิชาติ สิทธิ</h5>
-  </center>
 
-  <main class="container">
-    <div class="list">
-      <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
-        <button id="check-all-present" class="btn btn-primary btn-sm">มาทั้งหมด</button>
-        <button id="check-all-absent" class="btn btn-secondary btn-sm">ขาดทั้งหมด</button>
-        <button id="check-all-leave" class="btn btn-warning btn-sm">ลาทั้งหมด</button>
-        <button id="check-all-late" class="btn btn-danger btn-sm">สายทั้งหมด</button>
+  <!-- หัวข้อ -->
+  <div class="text-center mb-4">
+    <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" alt="โลโก้" style="width:180px; height:auto;">
+    <h2 class="mt-2">Student Attendance Apps</h2>
+    <h5 class="text-danger">สื่อและนวัตกรรม โดย ครูสิทธิชาติ สิทธิ</h5>
+  </div>
+
+  <!-- กล่องหลัก -->
+  <div class="container-box">
+
+    <!-- ปุ่มเลือกทั้งหมด -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+      <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
+      <button id="check-all-absent" class="btn btn-secondary btn-check-all">ขาดทั้งหมด</button>
+      <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
+      <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
+    </div>
+
+    <!-- ฟอร์มเช็คชื่อ -->
+    <form id="attendance-form">
+
+      <!-- เลือกคาบ -->
+      <div class="mb-4">
+        <label for="period-select" class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
+        <select id="period-select" class="form-select" required>
+          <option value="">-- เลือกคาบ --</option>
+          <option value="คาบโฮมรูม">คาบโฮมรูม</option>
+          <option value="คาบ1">คาบ1</option>
+          <option value="คาบ2">คาบ2</option>
+          <option value="คาบ3">คาบ3</option>
+          <option value="คาบ4">คาบ4</option>
+          <option value="คาบ5">คาบ5</option>
+          <option value="คาบ6">คาบ6</option>
+          <option value="คาบ7">คาบ7</option>
+          <option value="คาบ8">คาบ8</option>
+        </select>
       </div>
 
-      <form id="attendance-form" class="mt-4">
+      <!-- รายชื่อนักเรียน -->
+      <div class="mb-3">
+        <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
+      </div>
+      <div id="student-list" class="mb-4"></div>
 
-        <!-- Dropdown เลือกคาบ -->
-        <div class="mb-3">
-          <label for="period-select" class="form-label fw-bold">เลือกคาบเรียน:</label>
-          <select id="period-select" class="form-select" required>
-            <option value="">-- เลือกคาบ --</option>
-            <option value="คาบโฮมรูม">คาบโฮมรูม</option>
-            <option value="คาบ1">คาบ1</option>
-            <option value="คาบ2">คาบ2</option>
-            <option value="คาบ3">คาบ3</option>
-            <option value="คาบ4">คาบ4</option>
-            <option value="คาบ5">คาบ5</option>
-            <option value="คาบ6">คาบ6</option>
-            <option value="คาบ7">คาบ7</option>
-            <option value="คาบ8">คาบ8</option>
-          </select>
-        </div>
+      <!-- หมายเหตุ (ด้านล่างสุด) -->
+      <div class="mb-4">
+        <label for="note-input" class="form-label fw-bold text-success">
+          หมายเหตุเพิ่มเติม (ไม่บังคับ):
+        </label>
+        <textarea id="note-input" class="form-control note-box" rows="3" 
+                  placeholder="เช่น มีนักเรียนสาย 2 คน, แจกใบงานแล้ว, สอบย่อยวันนี้..."></textarea>
+      </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
-        </div>
-        <div id="student-list"></div>
+      <!-- ปุ่มบันทึก -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
+      </div>
+    </form>
 
-        <center>
-          <button type="submit" class="btn btn-primary mt-3">บันทึกข้อมูล</button>
-        </center>
-      </form>
-
-      <center>
-        <button id="send-summary" class="btn btn-success mt-3">แชร์ Flex Message</button>
-      </center>
+    <!-- ปุ่มแชร์ -->
+    <div class="text-center mt-3">
+      <button id="send-summary" class="btn btn-success btn-lg px-5">แชร์ Flex Message</button>
     </div>
-  </main>
+  </div>
 
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
   <script>
+    // ตัวแปร
     let attendanceRecords = [];
+    let noteText = '';
     const studentListUrl = 'https://opensheet.elk.sh/1Nrp7mvXCZaA-0PbbwCXeStW7WlmpgT0pDVobTA1l7g0/Name';
 
-    window.onload = function() {
+    // เริ่มต้น
+    window.onload = () => {
       liff.init({ liffId: '2008451449-Pvep2Jx2' })
         .then(() => {
-          if (!liff.isLoggedIn()) {
-            liff.login();
-          } else {
-            console.log('LIFF initialized');
+          if (!liff.isLoggedIn()) liff.login();
+          else {
             fetchStudentList();
             setupEventListeners();
           }
         })
         .catch(err => {
-          console.error('LIFF Error:', err);
+          console.error(err);
           Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเริ่มต้น LIFF ได้', 'error');
         });
     };
 
+    // ตั้งค่าปุ่ม
     function setupEventListeners() {
       document.getElementById('attendance-form').addEventListener('submit', addAttendanceRecord);
       document.getElementById('send-summary').addEventListener('click', sendSummary);
-      document.getElementById('check-all-present').addEventListener('click', () => checkAll('มา'));
-      document.getElementById('check-all-absent').addEventListener('click', () => checkAll('ขาด'));
-      document.getElementById('check-all-leave').addEventListener('click', () => checkAll('ลา'));
-      document.getElementById('check-all-late').addEventListener('click', () => checkAll('สาย'));
+
+      const actions = {
+        'check-all-present': 'มา',
+        'check-all-absent': 'ขาด',
+        'check-all-leave': 'ลา',
+        'check-all-late': 'สาย'
+      };
+      Object.keys(actions).forEach(id => {
+        document.getElementById(id).addEventListener('click', () => checkAll(actions[id]));
+      });
     }
 
+    // ดึงรายชื่อ
     function fetchStudentList() {
-      fetch(student  studentListUrl)
+      fetch(studentListUrl)
         .then(r => r.json())
         .then(data => generateStudentList(data))
-        .catch(err => {
-          console.error('Fetch error:', err);
-          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงรายชื่อนักเรียนได้', 'error');
-        });
+        .catch(() => Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงรายชื่อนักเรียนได้', 'error'));
     }
 
+    // สร้างรายชื่อ
     function generateStudentList(students) {
       const container = document.getElementById('student-list');
       container.innerHTML = '';
       students.forEach(s => {
         const row = document.createElement('div');
-        row.className = 'row mb-2 align-items-center';
+        row.className = 'row student-row mb-2 align-items-center';
         const num = s['เลขที่'];
         const name = s['รายชื่อนักเรียน'];
         row.innerHTML = `
@@ -162,10 +210,12 @@
       });
     }
 
+    // เลือกทั้งหมด
     function checkAll(status) {
       document.querySelectorAll(`input[value="${status}"]`).forEach(r => r.checked = true);
     }
 
+    // บันทึกข้อมูล
     function addAttendanceRecord(e) {
       e.preventDefault();
       attendanceRecords = [];
@@ -177,12 +227,16 @@
         return;
       }
 
+      noteText = document.getElementById('note-input').value.trim();
+
       document.querySelectorAll('#student-list .row').forEach(row => {
         const label = row.querySelector('.form-label').innerText;
         const name = label.replace(/^\d+\.\s*/, '').trim();
         const checked = row.querySelector('input:checked');
         if (checked) {
-          attendanceRecords.push({ name, status: checked.value, period });
+          attendanceRecords.push({
+            name, status: checked.value, period, note: noteText
+          });
         } else {
           allFilled = false;
         }
@@ -190,6 +244,7 @@
 
       if (allFilled) {
         saveToSheet(attendanceRecords);
+        // ล้างฟอร์ม
         document.getElementById('attendance-form').reset();
         document.getElementById('period-select').selectedIndex = 0;
       } else {
@@ -197,28 +252,30 @@
       }
     }
 
+    // บันทึกลง Google Sheet
     function saveToSheet(records) {
       $.LoadingOverlay("show");
-      const url = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม Web App URL ของคุณ
+      const url = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // แทนที่ด้วย URL ของคุณ
       $.post(url, JSON.stringify(records), data => {
         $.LoadingOverlay("hide");
-        if (data.status === 'success') {
-          Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-        } else {
-          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
-        }
+        const title = data.status === 'success' ? 'สำเร็จ' : 'ผิดพลาด';
+        const text = data.status === 'success' ? 'บันทึกข้อมูลเรียบร้อยแล้ว' : 'บันทึกไม่สำเร็จ';
+        const icon = data.status === 'success' ? 'success' : 'error';
+        Swal.fire(title, text, icon);
       }).fail(() => {
         $.LoadingOverlay("hide");
         Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
       });
     }
 
-    function formatThaiDate(date) {
+    // แปลงวันที่ไทย
+    function formatThaiDate(d) {
       const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
                       'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-      return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
+    // แชร์ Flex Message
     function sendSummary() {
       if (attendanceRecords.length === 0) {
         Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกข้อมูลก่อนแชร์', 'error');
@@ -227,12 +284,8 @@
 
       const period = document.getElementById('period-select').value || 'ไม่ระบุคาบ';
       const total = attendanceRecords.length;
-      const stats = {
-        มา: attendanceRecords.filter(r => r.status === 'มา').length,
-        ขาด: attendanceRecords.filter(r => r.status === 'ขาด').length,
-        ลา: attendanceRecords.filter(r => r.status === 'ลา').length,
-        สาย: attendanceRecords.filter(r => r.status === 'สาย').length
-      };
+      const stats = { มา: 0, ขาด: 0, ลา: 0, สาย: 0 };
+      attendanceRecords.forEach(r => stats[r.status]++);
 
       const dateStr = formatThaiDate(new Date());
 
@@ -266,9 +319,7 @@
                   contents: [
                     { type: 'text', text: r.name, size: 'md', color: '#555555', flex: 4 },
                     { type: 'text', text: r.status, size: 'md', align: 'end', flex: 2,
-                      color: r.status === 'มา' ? '#1DB446' :
-                             r.status === 'ขาด' ? '#FF5555' :
-                             r.status === 'ลา' ? '#FFC107' : '#FF8800'
+                      color: r.status === 'มา' ? '#1DB446' : r.status === 'ขาด' ? '#FF5555' : r.status === 'ลา' ? '#FFC107' : '#FF8800'
                     }
                   ]
                 }))
@@ -279,23 +330,32 @@
                 layout: 'vertical',
                 margin: 'lg',
                 spacing: 'xs',
-                contents: Object.entries(stats).map(([status, count]) => ({
+                contents: Object.entries(stats).map(([s, c]) => ({
                   type: 'box',
                   layout: 'horizontal',
                   contents: [
-                    { type: 'text', text: `${status}:`, size: 'md', flex: 3,
-                      color: status === 'มา' ? '#1DB446' :
-                             status === 'ขาด' ? '#FF5555' :
-                             status === 'ลา' ? '#FFC107' : '#FF8800'
+                    { type: 'text', text: `${s}:`, size: 'md', flex: 3,
+                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
                     },
-                    { type: 'text', text: `${count} คน (${((count/total)*100).toFixed(1)}%)`, size: 'md', flex: 2, align: 'end',
-                      color: status === 'มา' ? '#1DB446' :
-                             status === 'ขาด' ? '#FF5555' :
-                             status === 'ลา' ? '#FFC107' : '#FF8800'
+                    { type: 'text', text: `${c} คน (${((c/total)*100).toFixed(1)}%)`, size: 'md', flex: 2, align: 'end',
+                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
                     }
                   ]
                 }))
-              }
+              },
+              // หมายเหตุ
+              ...(noteText ? [
+                { type: 'separator', margin: 'lg' },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'lg',
+                  contents: [
+                    { type: 'text', text: 'หมายเหตุ', size: 'sm', color: '#888888', weight: 'bold' },
+                    { type: 'text', text: noteText, size: 'md', color: '#333333', wrap: true }
+                  ]
+                }
+              ] : [])
             ]
           }
         }
@@ -303,18 +363,20 @@
 
       liff.shareTargetPicker([flexMessage])
         .then(res => {
-          Swal.fire('สำเร็จ', res ? 'แชร์เรียบร้อยแล้ว' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
+          const title = res ? 'สำเร็จ' : 'ยกเลิก';
+          const text = res ? 'แชร์สรุปเรียบร้อยแล้ว' : 'ยกเลิกการแชร์';
+          const icon = res ? 'success' : 'info';
+          Swal.fire(title, text, icon);
           if (res) liff.closeWindow();
         })
-        .catch(err => {
-          console.error(err);
-          Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error');
-        });
+        .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error'));
     }
   </script>
 
+  <!-- Footer -->
   <footer>
-    <p>พัฒนาโดย ครูสิทธิชาติ สิทธิ</p>
+    <p>พัฒนาโดย <i class="fa fa-heart"></i> ครูสิทธิชาติ สิทธิ</p>
   </footer>
+
 </body>
 </html>
