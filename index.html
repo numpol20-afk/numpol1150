@@ -134,7 +134,7 @@
     let selectedPeriod = '';
     let selectedSubject = '';
 
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // แทนที่ด้วย URL จริง
     const TEACHER_PASSWORD = '123456'; // เปลี่ยนรหัสผ่านที่นี่
 
     const classrooms = [];
@@ -189,15 +189,25 @@
 
     function loadStudents(classroom) {
       $.LoadingOverlay("show");
+      console.log('Loading students for:', classroom); // Debug
       fetch(`${scriptUrl}?classroom=${encodeURIComponent(classroom)}`)
-        .then(r => r.json())
+        .then(r => {
+          console.log('Response status:', r.status); // Debug
+          return r.json();
+        })
         .then(data => {
+          console.log('Data received:', data); // Debug
+          if (data.error) {
+            Swal.fire('ผิดพลาด', `ไม่สามารถดึงข้อมูล: ${data.error}`, 'error');
+            return;
+          }
           generateStudentList(data);
           $.LoadingOverlay("hide");
         })
-        .catch(() => {
+        .catch(err => {
+          console.error('Fetch error:', err); // Debug
           $.LoadingOverlay("hide");
-          Swal.fire('ผิดพลาด', 'ไม่สามารถดึงรายชื่อได้', 'error');
+          Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้: ' + err.message, 'error');
         });
     }
 
