@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>เช็คชื่อนักเรียน - บันทึกลงชีท Form</title>
+  <title>ประกาศข่าวสารโรงเรียน</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -13,151 +12,83 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap');
     * { box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
-    body { background: linear-gradient(0deg, #fce9e9 0%, #e0f4f1 26%, #ffffff 71%); min-height: 100vh; padding: 20px 10px; }
-    .container-box { background: #fff; padding: 1.8rem 1.2rem; border-radius: 0.6rem; box-shadow: 0 3px 12px rgba(0,0,0,0.15); max-width: 600px; margin: auto; }
-    .btn-check-all { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
-    .student-row { font-size: 0.95rem; }
-    .student-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
-    .note-box { background: #f8f9fa; border-radius: 0.375rem; padding: 0.75rem; }
-    .empty-state { text-align: center; color: #888; padding: 40px 20px; }
-    footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
-    footer .fa { color: #fff740; }
-    .text-orange { color: #FF8800; }
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px 10px; }
+    .container-box { background: #fff; padding: 2rem 1.5rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 600px; margin: auto; }
+    .form-label { font-weight: 600; color: #333; }
+    .btn-primary { background: #5e35b1; border: none; }
+    .btn-success { background: #2e7d32; border: none; }
+    .preview-img { max-width: 100%; max-height: 200px; border-radius: 0.5rem; margin-top: 10px; display: none; }
+    footer { background: #1a1a1a; color: #fff; text-align: center; padding: 12px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
+    .target-badge { font-size: 0.9rem; padding: 0.35rem 0.7rem; border-radius: 2rem; }
   </style>
 </head>
 <body>
-  <div class="text-center mb-4">
-    <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" style="width:180px;">
-    <h2 class="mt-2">ระบบเช็คชื่อนักเรียน</h2>
-    <h5 class="text-danger">บันทึกลงชีท Form • ครูนำพล สาสิงห์</h5>
+  <div class="text-center mb-4 text-white">
+    <h2><i class="fas fa-bullhorn"></i> ประกาศข่าวสาร</h2>
+    <h5>โรงเรียนบ้านหนองขุ่น</h5>
   </div>
+
   <div class="container-box">
     <!-- รหัสผ่านครู -->
     <div class="mb-4" id="password-section">
-      <label class="form-label fw-bold text-danger">รหัสผ่านครู:</label>
-      <input type="password" id="teacher-password" class="form-control" placeholder="กรอกรหัสผ่าน">
-      <button id="login-btn" class="btn btn-primary mt-2 w-100">เข้าสู่ระบบ</button>
+      <label class="form-label text-danger">รหัสผ่านผู้ดูแล:</label>
+      <input type="password" id="admin-password" class="form-control" placeholder="กรอกรหัสผ่าน">
+      <button id="login-btn" class="btn btn-danger mt-2 w-100">เข้าสู่ระบบ</button>
     </div>
 
     <!-- ฟอร์มหลัก -->
     <div id="main-form" style="display: none;">
-      <!-- เลือกห้องเรียน -->
-      <div class="mb-4">
-        <label class="form-label fw-bold text-primary">เลือกห้องเรียน:</label>
-        <select id="classroom-select" class="form-select" required>
-          <option value="">-- เลือกห้อง --</option>
-        </select>
-      </div>
-      <!-- เลือกวิชา -->
-      <div class="mb-4">
-        <label class="form-label fw-bold text-primary">เลือกวิชา:</label>
-        <select id="subject-select" class="form-select" required>
-          <option value="">-- เลือกวิชา --</option>
-          <option value="คณิตศาสตร์">คณิตศาสตร์</option>
-          <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
-          <option value="ภาษาไทย">ภาษาไทย</option>
-          <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
-          <option value="สังคมศึกษา">สังคมศึกษา</option>
-          <option value="สุขศึกษา">สุขศึกษา</option>
-          <option value="ศิลปะ">ศิลปะ</option>
-          <option value="การงาน">การงาน</option>
-        </select>
-      </div>
-      <!-- เลือกคาบ -->
-      <div class="mb-4">
-        <label class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
-        <select id="period-select" class="form-select" required>
-          <option value="">-- เลือกคาบ --</option>
-          <option value="คาบโฮมรูม">คาบโฮมรูม</option>
-          <option value="คาบ1">คาบ1</option>
-          <option value="คาบ2">คาบ2</option>
-          <option value="คาบ3">คาบ3</option>
-          <option value="คาบ4">คาบ4</option>
-          <option value="คาบ5">คาบ5</option>
-          <option value="คาบ6">คาบ6</option>
-          <option value="คาบ7">คาบ7</option>
-          <option value="คาบ8">คาบ8</option>
-        </select>
-      </div>
-      <!-- ปุ่มเลือกทั้งหมด -->
-      <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-        <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
-        <button id="check-all-absent" class="btn btn-secondary btn-check-all">ขาดทั้งหมด</button>
-        <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
-        <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
-      </div>
-      <!-- รายชื่อนักเรียน -->
-      <div class="mb-3">
-        <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
-      </div>
-      <div id="student-list" class="mb-4">
-        <div class="empty-state">
-          <i class="fas fa-users fa-3x text-muted mb-3"></i>
-          <p>กรุณาเลือกห้องเรียนเพื่อเริ่มเช็คชื่อ</p>
-        </div>
-      </div>
-      <!-- หมายเหตุ -->
-      <div class="mb-4">
-        <label class="form-label fw-bold text-success">หมายเหตุเพิ่มเติม:</label>
-        <textarea id="note-input" class="form-control note-box" rows="3" placeholder="เช่น แจกใบงาน, สอบย่อย..."></textarea>
-      </div>
-      <!-- ปุ่มบันทึก -->
-      <div class="text-center">
-        <button id="save-btn" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
-      </div>
-      <div class="text-center mt-3">
-        <button id="send-summary" class="btn btn-success btn-lg px-5">แชร์ Flex Message</button>
-      </div>
-
-      <!-- ส่วนค้นหาข้อมูลการมาเรียน -->
-      <div class="mt-5 p-4 border rounded bg-light" id="search-section" style="display: none;">
-        <h4 class="text-primary mb-3">ดูข้อมูลการมาเรียน (จากชีท Form)</h4>
-        
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label fw-bold">ห้องเรียน:</label>
-            <select id="search-classroom" class="form-select">
-              <option value="">-- เลือกห้อง --</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-bold">วิชา:</label>
-            <select id="search-subject" class="form-select">
-              <option value="">-- เลือกวิชา --</option>
-              <option value="คณิตศาสตร์">คณิตศาสตร์</option>
-              <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
-              <option value="ภาษาไทย">ภาษาไทย</option>
-              <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
-              <option value="สังคมศึกษา">สังคมศึกษา</option>
-              <option value="สุขศึกษา">สุขศึกษา</option>
-              <option value="ศิลปะ">ศิลปะ</option>
-              <option value="การงาน">การงาน</option>
-            </select>
-          </div>
+      <form id="news-form">
+        <!-- กลุ่มเป้าหมาย -->
+        <div class="mb-4">
+          <label class="form-label text-primary">แจ้งถึง:</label>
+          <select id="target-select" class="form-select" required>
+            <option value="">-- เลือกกลุ่มเป้าหมาย --</option>
+            <option value="นักเรียน">นักเรียน</option>
+            <option value="ครู">ครู</option>
+            <option value="ผู้ปกครอง">ผู้ปกครอง</option>
+          </select>
         </div>
 
-        <div class="text-center mt-3">
-          <button id="search-btn" class="btn btn-info text-white">
-            ค้นหาข้อมูล
+        <!-- หัวข้อข่าว -->
+        <div class="mb-4">
+          <label class="form-label text-success">หัวข้อข่าว:</label>
+          <input type="text" id="title-input" class="form-control" placeholder="เช่น ประกาศวันหยุด, กิจกรรมกีฬาสี" required>
+        </div>
+
+        <!-- เนื้อหาข่าว -->
+        <div class="mb-4">
+          <label class="form-label text-info">เนื้อหาข่าวสาร:</label>
+          <textarea id="content-input" class="form-control" rows="5" placeholder="พิมพ์รายละเอียด..." required></textarea>
+        </div>
+
+        <!-- อัปโหลดรูป -->
+        <div class="mb-4">
+          <label class="form-label text-warning">รูปภาพประกอบ (ถ้ามี):</label>
+          <input type="file" id="image-input" class="form-control" accept="image/*">
+          <img id="preview" class="preview-img" alt="ตัวอย่างรูป">
+        </div>
+
+        <!-- ปุ่ม -->
+        <div class="d-grid gap-2">
+          <button type="button" id="save-btn" class="btn btn-primary btn-lg">
+            <i class="fas fa-save"></i> บันทึกข้อมูล
+          </button>
+          <button type="button" id="share-btn" class="btn btn-success btn-lg">
+            <i class="fab fa-line"></i> แชร์ผ่าน LINE
           </button>
         </div>
-
-        <div id="search-results" class="mt-4"></div>
-      </div>
+      </form>
     </div>
   </div>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    let attendanceRecords = [];
-    let noteText = '';
-    let selectedClassroom = '';
-    let selectedPeriod = '';
-    let selectedSubject = '';
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL จริง
-    const TEACHER_PASSWORD = '123456'; // เปลี่ยนรหัสผ่าน
-    const classrooms = [];
-    for (let g = 1; g <= 6; g++) for (let r = 1; r <= 11; r++) classrooms.push(`ม.${g}/${r}`);
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL
+    const ADMIN_PASSWORD = '123456'; // เปลี่ยนรหัสผ่าน
+
+    let newsData = {};
+    let imageFile = null;
 
     window.onload = () => {
       liff.init({ liffId: '2008451449-Pvep2Jx2' })
@@ -170,201 +101,144 @@
 
     function setupLogin() {
       document.getElementById('login-btn').addEventListener('click', () => {
-        const pass = document.getElementById('teacher-password').value;
-        if (pass === TEACHER_PASSWORD) {
+        const pass = document.getElementById('admin-password').value;
+        if (pass === ADMIN_PASSWORD) {
           document.getElementById('password-section').style.display = 'none';
           document.getElementById('main-form').style.display = 'block';
-          setupMainForm();
-          setupSearchSection();
+          setupForm();
         } else {
           Swal.fire('รหัสผ่านผิด', 'กรุณากรอกรหัสผ่านให้ถูกต้อง', 'error');
         }
       });
     }
 
-    function setupMainForm() {
-      const select = document.getElementById('classroom-select');
-      classrooms.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c; opt.textContent = c;
-        select.appendChild(opt);
-      });
-      select.addEventListener('change', () => {
-        selectedClassroom = select.value;
-        if (selectedClassroom) loadStudents(selectedClassroom);
-        else document.getElementById('student-list').innerHTML = `<div class="empty-state"><p>กรุณาเลือกห้องเรียน</p></div>`;
-      });
-      document.getElementById('save-btn').addEventListener('click', saveAttendance);
-      document.getElementById('send-summary').addEventListener('click', sendSummary);
-      ['present', 'absent', 'leave', 'late'].forEach(type => {
-        document.getElementById(`check-all-${type}`).addEventListener('click', () => {
-          const status = type === 'present' ? 'มา' : type === 'absent' ? 'ขาด' : type === 'leave' ? 'ลา' : 'สาย';
-          checkAll(status);
-        });
-      });
-    }
-
-    function loadStudents(classroom) {
-      $.LoadingOverlay("show", { custom: `<div class="text-center"><i class="fas fa-sync fa-spin fa-2x"></i><p>กำลังโหลด ${classroom}...</p></div>` });
-      fetch(`${scriptUrl}?classroom=${encodeURIComponent(classroom)}`)
-        .then(r => r.json())
-        .then(data => {
-          $.LoadingOverlay("hide");
-          if (data.error) { Swal.fire('ผิดพลาด', data.error, 'error'); return; }
-          generateStudentList(data);
-        })
-        .catch(() => { $.LoadingOverlay("hide"); Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); });
-    }
-
-    function generateStudentList(students) {
-      const container = document.getElementById('student-list');
-      container.innerHTML = '';
-      students.forEach((s, i) => {
-        const row = document.createElement('div');
-        row.className = 'row student-row mb-3 align-items-center';
-        const num = s.number || (i + 1);
-        row.innerHTML = `
-          <div class="col-2 text-center">
-            ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}">` : '<div style="width:40px;height:40px;background:#ddd;border-radius:50%"></div>'}
-          </div>
-          <div class="col-4"><label class="form-label mb-0">${num}. ${s.name}</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${i}" value="มา" required> มา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${i}" value="ขาด" required> ขาด</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${i}" value="ลา" required> ลา</label></div>
-          <div class="col-1 text-center"><label><input type="radio" name="s${i}" value="สาย" required> สาย</label></div>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function checkAll(status) {
-      document.querySelectorAll(`input[value="${status}"]`).forEach(r => r.checked = true);
-    }
-
-    function saveAttendance() {
-      attendanceRecords = [];
-      selectedClassroom = document.getElementById('classroom-select').value;
-      selectedPeriod = document.getElementById('period-select').value;
-      selectedSubject = document.getElementById('subject-select').value;
-      if (!selectedClassroom || !selectedPeriod || !selectedSubject) {
-        Swal.fire('กรุณาเลือกข้อมูล', 'โปรดเลือก ห้องเรียน วิชา และคาบเรียน', 'warning');
-        return;
-      }
-      noteText = document.getElementById('note-input').value.trim();
-      const rows = document.querySelectorAll('#student-list .row');
-      let allSelected = true;
-      rows.forEach(row => {
-        const name = row.querySelector('.form-label').innerText.replace(/^\d+\.\s*/, '').trim();
-        const checked = row.querySelector('input:checked');
-        const img = row.querySelector('img');
-        const imageUrl = img ? img.src : '';
-        if (checked) {
-          attendanceRecords.push({
-            name, status: checked.value, period: selectedPeriod,
-            subject: selectedSubject, classroom: selectedClassroom,
-            note: noteText, imageUrl: imageUrl
-          });
-        } else allSelected = false;
-      });
-      if (!allSelected) {
-        Swal.fire('กรุณาระบุสถานะทุกคน', 'โปรดเลือกสถานะของนักเรียนทุกคน', 'error');
-        return;
-      }
-      $.LoadingOverlay("show");
-      $.post(scriptUrl, JSON.stringify(attendanceRecords), data => {
-        $.LoadingOverlay("hide");
-        if (data.status === 'success') {
-          Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว<br>ลงชีท <strong>Form</strong> แล้ว', 'success');
-          document.getElementById('note-input').value = '';
+    function setupForm() {
+      const preview = document.getElementById('preview');
+      document.getElementById('image-input').addEventListener('change', e => {
+        imageFile = e.target.files[0];
+        if (imageFile) {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            preview.src = ev.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(imageFile);
         } else {
-          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
+          preview.style.display = 'none';
         }
-      }).fail(() => {
-        $.LoadingOverlay("hide");
-        Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+      });
+
+      document.getElementById('save-btn').addEventListener('click', saveNews);
+      document.getElementById('share-btn').addEventListener('click', shareNews);
+    }
+
+    function uploadImage() {
+      if (!imageFile) return Promise.resolve('');
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1];
+          const url = `https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec?upload=image`;
+          fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ image: base64, name: imageFile.name })
+          })
+          .then(r => r.json())
+          .then(data => resolve(data.url || ''))
+          .catch(reject);
+        };
+        reader.readAsDataURL(imageFile);
       });
     }
 
-    function formatThaiDate(d) {
-      const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
-    }
+    async function saveNews() {
+      const target = document.getElementById('target-select').value;
+      const title = document.getElementById('title-input').value.trim();
+      const content = document.getElementById('content-input').value.trim();
 
-    function sendSummary() {
-      if (attendanceRecords.length === 0) {
-        Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกก่อนแชร์', 'error');
+      if (!target || !title || !content) {
+        Swal.fire('กรุณากรอกข้อมูล', 'โปรดระบุ กลุ่มเป้าหมาย หัวข้อ และเนื้อหา', 'warning');
         return;
       }
-      const total = attendanceRecords.length;
-      const stats = { มา: 0, ขาด: 0, ลา: 0, สาย: 0 };
-      attendanceRecords.forEach(r => stats[r.status]++);
-      const dateStr = formatThaiDate(new Date());
+
+      $.LoadingOverlay("show");
+      try {
+        const imageUrl = await uploadImage();
+        const payload = { target, title, content, imageUrl };
+
+        $.post(scriptUrl, JSON.stringify(payload), res => {
+          $.LoadingOverlay("hide");
+          if (res.status === 'success') {
+            Swal.fire('สำเร็จ!', 'บันทึกข่าวสารเรียบร้อยแล้ว', 'success');
+            document.getElementById('news-form').reset();
+            document.getElementById('preview').style.display = 'none';
+            newsData = payload;
+          } else {
+            Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
+          }
+        }).fail(() => {
+          $.LoadingOverlay("hide");
+          Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
+        });
+      } catch (err) {
+        $.LoadingOverlay("hide");
+        Swal.fire('ผิดพลาด', 'อัปโหลดรูปภาพล้มเหลว', 'error');
+      }
+    }
+
+    function shareNews() {
+      const target = document.getElementById('target-select').value;
+      const title = document.getElementById('title-input').value.trim();
+      const content = document.getElementById('content-input').value.trim();
+      const imageUrl = document.getElementById('preview').src;
+
+      if (!target || !title || !content) {
+        Swal.fire('กรุณากรอกข้อมูล', 'กรอกข้อมูลให้ครบก่อนแชร์', 'warning');
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+
       const flexMessage = {
         type: 'flex',
-        altText: `สรุป ${selectedClassroom} ${selectedSubject} ${selectedPeriod}`,
+        altText: `ประกาศ: ${title}`,
         contents: {
           type: 'bubble',
-          size: 'giga',
+          size: 'mega',
           header: {
             type: 'box',
             layout: 'vertical',
             contents: [
-              { type: 'text', text: `สรุปการเข้าเรียน ${selectedClassroom}`, weight: 'bold', size: 'xl', color: '#1DB446' },
-              { type: 'text', text: `${dateStr} • ${selectedSubject} • ${selectedPeriod}`, size: 'sm', color: '#888888' }
+              { type: 'text', text: 'ประกาศข่าวสาร', size: 'sm', color: '#aaaaaa' },
+              { type: 'text', text: title, size: 'xl', weight: 'bold', color: '#1a1a1a', wrap: true },
+              { type: 'text', text: `ถึง: ${target}`, size: 'md', color: '#555555', margin: 'md' }
             ]
           },
           body: {
             type: 'box',
             layout: 'vertical',
             contents: [
-              { type: 'separator', margin: 'md' },
-              {
-                type: 'box',
-                layout: 'vertical',
-                margin: 'md',
-                spacing: 'sm',
-                contents: attendanceRecords.map(r => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: r.name, size: 'md', color: '#555555', flex: 4 },
-                    { type: 'text', text: r.status, size: 'md', align: 'end', flex: 2,
-                      color: r.status === 'มา' ? '#1DB446' : r.status === 'ขาด' ? '#FF5555' : r.status === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
-              },
               { type: 'separator', margin: 'lg' },
-              {
-                type: 'box',
-                layout: 'vertical',
-                margin: 'lg',
-                spacing: 'xs',
-                contents: Object.entries(stats).map(([s, c]) => ({
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: `${s}:`, size: 'md', flex: 3,
-                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
-                    },
-                    { type: 'text', text: `${c} คน (${((c/total)*100).toFixed(1)}%)`, size: 'md', flex: 2, align: 'end',
-                      color: s === 'มา' ? '#1DB446' : s === 'ขาด' ? '#FF5555' : s === 'ลา' ? '#FFC107' : '#FF8800'
-                    }
-                  ]
-                }))
-              },
-              ...(noteText ? [
-                { type: 'separator', margin: 'lg' },
-                { type: 'box', layout: 'vertical', margin: 'lg', contents: [
-                  { type: 'text', text: 'หมายเหตุ', size: 'sm', color: '#888888', weight: 'bold' },
-                  { type: 'text', text: noteText, size: 'md', color: '#333333', wrap: true }
-                ]}
-              ] : [])
+              { type: 'text', text: content, size: 'md', color: '#333333', margin: 'lg', wrap: true },
+              ...(imageUrl && imageUrl !== 'none' ? [
+                { type: 'image', url: imageUrl, size: 'full', aspectRatio: '3:2', aspectMode: 'cover', margin: 'lg' }
+              ] : []),
+              { type: 'separator', margin: 'lg' },
+              { type: 'text', text: `วันที่: ${dateStr}`, size: 'sm', color: '#888888', align: 'end', margin: 'md' }
+            ]
+          },
+          footer: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              { type: 'text', text: 'โรงเรียนบ้านหนองขุ่น', size: 'sm', color: '#888888', align: 'center' }
             ]
           }
         }
       };
+
       liff.shareTargetPicker([flexMessage])
         .then(res => {
           Swal.fire(res ? 'สำเร็จ' : 'ยกเลิก', res ? 'แชร์เรียบร้อย' : 'ยกเลิกการแชร์', res ? 'success' : 'info');
@@ -372,97 +246,9 @@
         })
         .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error'));
     }
-
-    // ===============================================
-    // ส่วนค้นหาข้อมูลการมาเรียน (จากชีท Form) - แก้ไขแล้ว
-    // ===============================================
-    function setupSearchSection() {
-      const searchSection = document.getElementById('search-section');
-      searchSection.style.display = 'block';
-
-      const searchClassroom = document.getElementById('search-classroom');
-      classrooms.forEach(c => searchClassroom.add(new Option(c, c)));
-
-      document.getElementById('search-btn').addEventListener('click', () => {
-        const classroom = document.getElementById('search-classroom').value;
-        const subject = document.getElementById('search-subject').value;
-
-        if (!classroom || !subject) {
-          Swal.fire('กรุณาเลือก', 'โปรดเลือกทั้งห้องเรียนและวิชา', 'warning');
-          return;
-        }
-
-        $.LoadingOverlay("show", { custom: `<div class="text-center"><i class="fas fa-search fa-spin fa-2x"></i><p>กำลังค้นหา...</p></div>` });
-
-        fetch(`${scriptUrl}?action=search&classroom=${encodeURIComponent(classroom)}&subject=${encodeURIComponent(subject)}`)
-          .then(r => r.json())
-          .then(data => {
-            $.LoadingOverlay("hide");
-            displaySearchResults(data, classroom, subject);
-          })
-          .catch(() => {
-            $.LoadingOverlay("hide");
-            Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
-          });
-      });
-    }
-
-    function displaySearchResults(data, classroom, subject) {
-      const container = document.getElementById('search-results');
-      
-      if (data.error) {
-        container.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${data.error}</div>`;
-        return;
-      }
-      if (data.message) {
-        container.innerHTML = `<div class="alert alert-info"><i class="fas fa-info-circle"></i> ${data.message}</div>`;
-        return;
-      }
-
-      let table = `
-        <div class="alert alert-success small mb-3">
-          <i class="fas fa-check-circle"></i> พบข้อมูล ${data.length} รายการ
-        </div>
-        <h6 class="text-muted mb-3">ผลการค้นหา: ${classroom} - ${subject}</h6>
-        <div class="table-responsive">
-          <table class="table table-striped table-sm align-middle">
-            <thead class="table-primary">
-              <tr>
-                <th>วันที่</th>
-                <th>เวลา</th>
-                <th>คาบ</th>
-                <th>ชื่อนักเรียน</th>
-                <th>สถานะ</th>
-                <th>หมายเหตุ</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      data.forEach(r => {
-        const statusClass = 
-          r.status === 'มา' ? 'text-success' :
-          r.status === 'ขาด' ? 'text-danger' :
-          r.status === 'ลา' ? 'text-warning' : 'text-orange';
-        
-        table += `
-          <tr>
-            <td><small>${r.date}</small></td>
-            <td><small>${r.time}</small></td>
-            <td><small>${r.period}</small></td>
-            <td>${r.name}</td>
-            <td><strong class="${statusClass}">${r.status}</strong></td>
-            <td><small>${r.note}</small></td>
-          </tr>
-        `;
-      });
-
-      table += `</tbody></table></div>`;
-      container.innerHTML = table;
-    }
   </script>
   <footer>
-    <p>พัฒนาโดย ครูนำพล สาสิงห์</p>
+    <p>พัฒนาโดย ครูนำพล สาสิงห์ | @NumpolSasing</p>
   </footer>
 </body>
 </html>
