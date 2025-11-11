@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>เช็คชื่อนักเรียน (ไม่มีรูปภาพ)</title>
+  <title>เช็คชื่อ + อัปโหลดรูปภาพ (คอลัมน์ I)</title>
+
   <!-- CSS & Libraries -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0 g/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap');
     * { box-sizing: border-box; font-family: 'Noto Sans Thai', sans-serif; }
@@ -20,25 +22,33 @@
     .student-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
     .note-box { background: #f8f9fa; border-radius: 0.375rem; padding: 0.75rem; }
     .empty-state { text-align: center; color: #888; padding: 40px 20px; }
+    .image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; display: none; }
+    .upload-area { border: 2px dashed #007bff; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; background: #f0f8ff; }
+    .upload-area:hover { background: #e3f2fd; }
     footer { background: #000; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
     footer .fa { color: #fff740; }
   </style>
 </head>
 <body>
+
   <div class="text-center mb-4">
     <img src="https://lh3.googleusercontent.com/d/1ZMI9FTcErAj1N8vh0viy3rAPnxZ7Zsky" style="width:180px;">
     <h2 class="mt-2">ระบบเช็คชื่อนักเรียน</h2>
-    <h5 class="text-danger">ครูสิทธิชาติ สิทธิ</h5>
+    <h5 class="text-danger">บันทึกภาพในคอลัมน์ I • ครูสิทธิชาติ สิทธิ</h5>
   </div>
+
   <div class="container-box">
+
     <!-- รหัสผ่านครู -->
     <div class="mb-4" id="password-section">
       <label class="form-label fw-bold text-danger">รหัสผ่านครู:</label>
       <input type="password" id="teacher-password" class="form-control" placeholder="กรอกรหัสผ่าน">
       <button id="login-btn" class="btn btn-primary mt-2 w-100">เข้าสู่ระบบ</button>
     </div>
+
     <!-- ฟอร์มหลัก -->
     <div id="main-form" style="display: none;">
+
       <!-- เลือกห้องเรียน -->
       <div class="mb-4">
         <label class="form-label fw-bold text-primary">เลือกห้องเรียน:</label>
@@ -46,6 +56,7 @@
           <option value="">-- เลือกห้อง --</option>
         </select>
       </div>
+
       <!-- เลือกวิชา -->
       <div class="mb-4">
         <label class="form-label fw-bold text-primary">เลือกวิชา:</label>
@@ -61,6 +72,7 @@
           <option value="การงาน">การงาน</option>
         </select>
       </div>
+
       <!-- เลือกคาบ -->
       <div class="mb-4">
         <label class="form-label fw-bold text-primary">เลือกคาบเรียน:</label>
@@ -77,6 +89,7 @@
           <option value="คาบ8">คาบ8</option>
         </select>
       </div>
+
       <!-- ปุ่มเลือกทั้งหมด -->
       <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
         <button id="check-all-present" class="btn btn-primary btn-check-all">มาทั้งหมด</button>
@@ -84,6 +97,7 @@
         <button id="check-all-leave" class="btn btn-warning btn-check-all">ลาทั้งหมด</button>
         <button id="check-all-late" class="btn btn-danger btn-check-all">สายทั้งหมด</button>
       </div>
+
       <!-- รายชื่อนักเรียน -->
       <div class="mb-3">
         <label class="form-label fw-bold">รายชื่อนักเรียน:</label>
@@ -94,11 +108,24 @@
           <p>กรุณาเลือกห้องเรียนเพื่อเริ่มเช็คชื่อ</p>
         </div>
       </div>
+
       <!-- หมายเหตุ -->
       <div class="mb-4">
         <label class="form-label fw-bold text-success">หมายเหตุเพิ่มเติม:</label>
         <textarea id="note-input" class="form-control note-box" rows="3" placeholder="เช่น แจกใบงาน, สอบย่อย..."></textarea>
       </div>
+
+      <!-- อัปโหลดรูปภาพ -->
+      <div class="mb-4">
+        <label class="form-label fw-bold text-info">อัปโหลดรูปภาพ (คอลัมน์ I):</label>
+        <div class="upload-area" id="upload-area">
+          <i class="fas fa-camera fa-3x text-primary mb-2"></i>
+          <p>คลิกเพื่อถ่ายรูปหรือเลือกจากคลัง</p>
+          <input type="file" id="image-input" accept="image/*" capture="environment" style="display: none;">
+        </div>
+        <img id="image-preview" class="image-preview" alt="ตัวอย่างภาพ">
+      </div>
+
       <!-- ปุ่ม -->
       <div class="text-center">
         <button id="save-btn" class="btn btn-primary btn-lg px-5">บันทึกข้อมูล</button>
@@ -110,14 +137,18 @@
   </div>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
   <script>
     let attendanceRecords = [];
     let noteText = '';
     let selectedClassroom = '';
     let selectedPeriod = '';
     let selectedSubject = '';
+    let uploadedImageUrl = '';
+
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // แทนที่ด้วย URL จริง
     const TEACHER_PASSWORD = '123456';
+
     const classrooms = [];
     for (let g = 1; g <= 6; g++) for (let r = 1; r <= 11; r++) classrooms.push(`ม.${g}/${r}`);
 
@@ -150,10 +181,29 @@
         opt.value = c; opt.textContent = c;
         select.appendChild(opt);
       });
+
       select.addEventListener('change', () => {
         selectedClassroom = select.value;
         if (selectedClassroom) loadStudents(selectedClassroom);
         else resetStudentList();
+      });
+
+      const uploadArea = document.getElementById('upload-area');
+      const imageInput = document.getElementById('image-input');
+      const imagePreview = document.getElementById('image-preview');
+
+      uploadArea.addEventListener('click', () => imageInput.click());
+      imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            uploadImage(file);
+          };
+          reader.readAsDataURL(file);
+        }
       });
 
       document.getElementById('save-btn').addEventListener('click', saveAttendance);
@@ -197,7 +247,7 @@
         const num = s.number || (i + 1);
         row.innerHTML = `
           <div class="col-2 text-center">
-            <div style="width:40px;height:40px;background:#ddd;border-radius:50%"></div>
+            ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}">` : '<div style="width:40px;height:40px;background:#ddd;border-radius:50%"></div>'}
           </div>
           <div class="col-4"><label class="form-label mb-0">${num}. ${s.name}</label></div>
           <div class="col-1 text-center"><label><input type="radio" name="s${i}" value="มา" required> มา</label></div>
@@ -213,18 +263,48 @@
       document.querySelectorAll(`input[value="${status}"]`).forEach(r => r.checked = true);
     }
 
+    function uploadImage(file) {
+      $.LoadingOverlay("show", { custom: `<div class="text-center"><i class="fas fa-upload fa-spin"></i><p>กำลังอัปโหลดรูป...</p></div>` });
+      const reader = new FileReader();
+      reader.onload = e => {
+        const base64 = e.target.result.split(',')[1];
+        $.post(scriptUrl, {
+          action: 'upload',
+          data: base64,
+          mimetype: file.type,
+          filename: `ภาพ_${Date.now()}.jpg`
+        }, res => {
+          $.LoadingOverlay("hide");
+          if (res.imageUrl) {
+            uploadedImageUrl = res.imageUrl;
+            Swal.fire('สำเร็จ!', 'อัปโหลดรูปภาพเรียบร้อย<br>บันทึกในคอลัมน์ I', 'success');
+          } else {
+            Swal.fire('ผิดพลาด', 'อัปโหลดไม่สำเร็จ', 'error');
+          }
+        }).fail(() => {
+          $.LoadingOverlay("hide");
+          Swal.fire('ผิดพลาด', 'ไม่สามารถอัปโหลดได้', 'error');
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
     function saveAttendance() {
       attendanceRecords = [];
       selectedClassroom = document.getElementById('classroom-select').value;
       selectedPeriod = document.getElementById('period-select').value;
       selectedSubject = document.getElementById('subject-select').value;
+
       if (!selectedClassroom || !selectedPeriod || !selectedSubject) {
         Swal.fire('กรุณาเลือกข้อมูล', 'โปรดเลือก ห้องเรียน วิชา และคาบเรียน', 'warning');
         return;
       }
+
       noteText = document.getElementById('note-input').value.trim();
+
       const rows = document.querySelectorAll('#student-list .row');
       let allSelected = true;
+
       rows.forEach(row => {
         const name = row.querySelector('.form-label').innerText.replace(/^\d+\.\s*/, '').trim();
         const checked = row.querySelector('input:checked');
@@ -232,31 +312,28 @@
           attendanceRecords.push({
             name, status: checked.value, period: selectedPeriod,
             subject: selectedSubject, classroom: selectedClassroom,
-            note: noteText
+            note: noteText, imageUrl: uploadedImageUrl
           });
         } else allSelected = false;
       });
+
       if (!allSelected) {
         Swal.fire('กรุณาระบุสถานะทุกคน', 'โปรดเลือกสถานะของนักเรียนทุกคน', 'error');
         return;
       }
+
       $.LoadingOverlay("show");
-      fetch(scriptUrl, {
-        method: 'POST',
-        body: JSON.stringify(attendanceRecords),
-        headers: { 'Content-Type': 'text/plain' }
-      })
-      .then(r => r.json())
-      .then(data => {
+      $.post(scriptUrl, JSON.stringify(attendanceRecords), data => {
         $.LoadingOverlay("hide");
         if (data.status === 'success') {
-          Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+          Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว<br>ภาพอยู่ในคอลัมน์ <strong>I</strong>', 'success');
           document.getElementById('note-input').value = '';
+          document.getElementById('image-preview').style.display = 'none';
+          uploadedImageUrl = '';
         } else {
           Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
         }
-      })
-      .catch(() => {
+      }).fail(() => {
         $.LoadingOverlay("hide");
         Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
       });
@@ -273,10 +350,13 @@
         Swal.fire('ไม่มีข้อมูล', 'กรุณาบันทึกก่อนแชร์', 'error');
         return;
       }
+
       const total = attendanceRecords.length;
       const stats = { มา: 0, ขาด: 0, ลา: 0, สาย: 0 };
       attendanceRecords.forEach(r => stats[r.status]++);
+
       const dateStr = formatThaiDate(new Date());
+
       const flexMessage = {
         type: 'flex',
         altText: `สรุป ${selectedClassroom} ${selectedSubject} ${selectedPeriod}`,
@@ -295,6 +375,10 @@
             type: 'box',
             layout: 'vertical',
             contents: [
+              ...(uploadedImageUrl ? [
+                { type: 'image', url: uploadedImageUrl, size: 'full', aspectRatio: '3:2', aspectMode: 'cover' },
+                { type: 'separator', margin: 'md' }
+              ] : []),
               {
                 type: 'box',
                 layout: 'vertical',
@@ -341,6 +425,7 @@
           }
         }
       };
+
       liff.shareTargetPicker([flexMessage])
         .then(res => {
           Swal.fire(res ? 'สำเร็จ' : 'ยกเลิก', res ? 'แชร์เรียบร้อย' : 'ยกเลิก', res ? 'success' : 'info');
@@ -349,8 +434,10 @@
         .catch(() => Swal.fire('ผิดพลาด', 'ไม่สามารถแชร์ได้', 'error'));
     }
   </script>
+
   <footer>
     <p>พัฒนาโดย ครูสิทธิชาติ สิทธิ</p>
   </footer>
+
 </body>
 </html>
