@@ -374,7 +374,7 @@
     }
 
     // ===============================================
-    // ส่วนค้นหาข้อมูลการมาเรียน (จากชีท Form)
+    // ส่วนค้นหาข้อมูลการมาเรียน (จากชีท Form) - แก้ไขแล้ว
     // ===============================================
     function setupSearchSection() {
       const searchSection = document.getElementById('search-section');
@@ -411,21 +411,25 @@
       const container = document.getElementById('search-results');
       
       if (data.error) {
-        container.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        container.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${data.error}</div>`;
         return;
       }
       if (data.message) {
-        container.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
+        container.innerHTML = `<div class="alert alert-info"><i class="fas fa-info-circle"></i> ${data.message}</div>`;
         return;
       }
 
       let table = `
+        <div class="alert alert-success small mb-3">
+          <i class="fas fa-check-circle"></i> พบข้อมูล ${data.length} รายการ
+        </div>
         <h6 class="text-muted mb-3">ผลการค้นหา: ${classroom} - ${subject}</h6>
         <div class="table-responsive">
           <table class="table table-striped table-sm align-middle">
             <thead class="table-primary">
               <tr>
                 <th>วันที่</th>
+                <th>เวลา</th>
                 <th>คาบ</th>
                 <th>ชื่อนักเรียน</th>
                 <th>สถานะ</th>
@@ -444,6 +448,7 @@
         table += `
           <tr>
             <td><small>${r.date}</small></td>
+            <td><small>${r.time}</small></td>
             <td><small>${r.period}</small></td>
             <td>${r.name}</td>
             <td><strong class="${statusClass}">${r.status}</strong></td>
@@ -457,7 +462,7 @@
     }
   </script>
   <footer>
-    <p>พัฒนาโดย ครูนำพล สาสิงห์1</p>
+    <p>พัฒนาโดย ครูนำพล สาสิงห์</p>
   </footer>
 </body>
 </html>
