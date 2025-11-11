@@ -17,6 +17,7 @@
     .form-label { font-weight: 600; color: #333; }
     .btn-primary { background: #5e35b1; border: none; }
     .btn-success { background: #2e7d32; border: none; }
+    .btn-success:disabled { background: #aaa; cursor: not-allowed; }
     .preview-img { max-width: 100%; max-height: 200px; border-radius: 0.5rem; margin-top: 10px; display: none; }
     footer { background: #1a1a1a; color: #fff; text-align: center; padding: 12px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
     .target-badge { font-size: 0.9rem; padding: 0.35rem 0.7rem; border-radius: 2rem; }
@@ -24,7 +25,7 @@
 </head>
 <body>
   <div class="text-center mb-4 text-white">
-    <h2><i class="fas fa-bullhorn"></i> ประกาศข่าวสาร</h2>
+    <h2>ประกาศข่าวสาร</h2>
     <h5>โรงเรียนบ้านหนองขุ่น</h5>
   </div>
 
@@ -72,10 +73,10 @@
         <!-- ปุ่ม -->
         <div class="d-grid gap-2">
           <button type="button" id="save-btn" class="btn btn-primary btn-lg">
-            <i class="fas fa-save"></i> บันทึกข้อมูล
+            บันทึกข้อมูล
           </button>
-          <button type="button" id="share-btn" class="btn btn-success btn-lg">
-            <i class="fab fa-line"></i> แชร์ผ่าน LINE
+          <button type="button" id="share-btn" class="btn btn-success btn-lg" disabled>
+            แชร์ผ่าน LINE
           </button>
         </div>
       </form>
@@ -84,10 +85,10 @@
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL จริง
     const ADMIN_PASSWORD = '123456'; // เปลี่ยนรหัสผ่าน
 
-    let newsData = {};
+    let newsData = null; // เก็บข้อมูลหลังบันทึก
     let imageFile = null;
 
     window.onload = () => {
@@ -132,6 +133,7 @@
       document.getElementById('share-btn').addEventListener('click', shareNews);
     }
 
+    // อัปโหลดรูปภาพ (ถ้ามี)
     function uploadImage() {
       if (!imageFile) return Promise.resolve('');
       
@@ -139,7 +141,7 @@
         const reader = new FileReader();
         reader.onload = () => {
           const base64 = reader.result.split(',')[1];
-          const url = `https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec?upload=image`;
+          const url = `${scriptUrl}?upload=image`;
           fetch(url, {
             method: 'POST',
             body: JSON.stringify({ image: base64, name: imageFile.name })
@@ -152,6 +154,7 @@
       });
     }
 
+    // บันทึกข้อมูล
     async function saveNews() {
       const target = document.getElementById('target-select').value;
       const title = document.getElementById('title-input').value.trim();
@@ -170,10 +173,22 @@
         $.post(scriptUrl, JSON.stringify(payload), res => {
           $.LoadingOverlay("hide");
           if (res.status === 'success') {
-            Swal.fire('สำเร็จ!', 'บันทึกข่าวสารเรียบร้อยแล้ว', 'success');
+            // บันทึกสำเร็จ → เก็บข้อมูล + เปิดปุ่มแชร์
+            newsData = payload;
+            document.getElementById('share-btn').disabled = false;
+            document.getElementById('share-btn').innerHTML = 'แชร์ผ่าน LINE';
+
+            Swal.fire({
+              title: 'สำเร็จ!',
+              text: 'บันทึกข้อมูลเรียบร้อยแล้ว สามารถแชร์ได้เลย',
+              icon: 'success',
+              confirmButtonText: 'ตกลง'
+            });
+
+            // รีเซ็ตฟอร์ม
             document.getElementById('news-form').reset();
             document.getElementById('preview').style.display = 'none';
-            newsData = payload;
+            imageFile = null;
           } else {
             Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
           }
@@ -187,17 +202,14 @@
       }
     }
 
+    // แชร์ Flex Message
     function shareNews() {
-      const target = document.getElementById('target-select').value;
-      const title = document.getElementById('title-input').value.trim();
-      const content = document.getElementById('content-input').value.trim();
-      const imageUrl = document.getElementById('preview').src;
-
-      if (!target || !title || !content) {
-        Swal.fire('กรุณากรอกข้อมูล', 'กรอกข้อมูลให้ครบก่อนแชร์', 'warning');
+      if (!newsData) {
+        Swal.fire('ยังไม่ได้บันทึก', 'กรุณากด "บันทึกข้อมูล" ก่อนแชร์', 'warning');
         return;
       }
 
+      const { target, title, content, imageUrl } = newsData;
       const now = new Date();
       const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -222,7 +234,7 @@
             contents: [
               { type: 'separator', margin: 'lg' },
               { type: 'text', text: content, size: 'md', color: '#333333', margin: 'lg', wrap: true },
-              ...(imageUrl && imageUrl !== 'none' ? [
+              ...(imageUrl ? [
                 { type: 'image', url: imageUrl, size: 'full', aspectRatio: '3:2', aspectMode: 'cover', margin: 'lg' }
               ] : []),
               { type: 'separator', margin: 'lg' },
@@ -248,7 +260,7 @@
     }
   </script>
   <footer>
-    <p>พัฒนาโดย ครูนำพล สาสิงห์ | @NumpolSasing</p>
+    <p>พัฒนาโดย ครูนำพล สาสิงห์1 | @NumpolSasing</p>
   </footer>
 </body>
 </html>
