@@ -16,16 +16,12 @@
     .container-box { background: #fff; padding: 2rem 1.5rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 600px; margin: auto; }
     .form-label { font-weight: 600; color: #333; }
     .btn-primary { background: #5e35b1; border: none; }
-    .btn-success { background: #2e7d32; border: none; }
-    .btn-success:disabled { background: #aaa; cursor: not-allowed; }
-    .preview-img { max-width: 100%; max-height: 200px; border-radius: 0.5rem; margin-top: 10px; display: none; }
     footer { background: #1a1a1a; color: #fff; text-align: center; padding: 12px; position: fixed; bottom: 0; width: 100%; font-size: 0.9rem; }
-    .target-badge { font-size: 0.9rem; padding: 0.35rem 0.7rem; border-radius: 2rem; }
   </style>
 </head>
 <body>
   <div class="text-center mb-4 text-white">
-    <h2><i class="fas fa-bullhorn"></i> ประกาศข่าวสาร</h2>
+    <h2>ประกาศข่าวสาร</h2>
     <h5>โรงเรียนบ้านหนองขุ่น</h5>
   </div>
 
@@ -63,20 +59,16 @@
           <textarea id="content-input" class="form-control" rows="5" placeholder="พิมพ์รายละเอียด..." required></textarea>
         </div>
 
-        <!-- อัปโหลดรูป -->
+        <!-- ประกาศจาก -->
         <div class="mb-4">
-          <label class="form-label text-warning">รูปภาพประกอบ (ถ้ามี):</label>
-          <input type="file" id="image-input" class="form-control" accept="image/*">
-          <img id="preview" class="preview-img" alt="ตัวอย่างรูป">
+          <label class="form-label text-secondary">ประกาศจาก:</label>
+          <input type="text" id="announcer-input" class="form-control" placeholder="เช่น ผอ.โรงเรียน, ครูใหญ่" value="ครูนำพล สาสิงห์">
         </div>
 
-        <!-- ปุ่ม -->
-        <div class="d-grid gap-2">
+        <!-- ปุ่มบันทึก -->
+        <div class="d-grid">
           <button type="button" id="save-btn" class="btn btn-primary btn-lg">
-            <i class="fas fa-save"></i> บันทึกข้อมูล
-          </button>
-          <button type="button" id="share-btn" class="btn btn-success btn-lg" disabled>
-            <i class="fab fa-line"></i> แชร์ผ่าน LINE
+            บันทึกข้อมูล
           </button>
         </div>
       </form>
@@ -87,8 +79,8 @@
   <script>
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL จริง
     const ADMIN_PASSWORD = '123456';
+
     let newsData = null;
-    let imageFile = null;
 
     window.onload = () => {
       liff.init({ liffId: '2008451449-Pvep2Jx2' })
@@ -105,50 +97,10 @@
         if (pass === ADMIN_PASSWORD) {
           document.getElementById('password-section').style.display = 'none';
           document.getElementById('main-form').style.display = 'block';
-          setupForm();
+          document.getElementById('save-btn').addEventListener('click', saveNews);
         } else {
           Swal.fire('รหัสผ่านผิด', 'กรุณากรอกรหัสผ่านให้ถูกต้อง', 'error');
         }
-      });
-    }
-
-    function setupForm() {
-      const preview = document.getElementById('preview');
-      document.getElementById('image-input').addEventListener('change', e => {
-        imageFile = e.target.files[0];
-        if (imageFile) {
-          const reader = new FileReader();
-          reader.onload = ev => {
-            preview.src = ev.target.result;
-            preview.style.display = 'block';
-          };
-          reader.readAsDataURL(imageFile);
-        } else {
-          preview.style.display = 'none';
-        }
-      });
-
-      document.getElementById('save-btn').addEventListener('click', saveNews);
-      document.getElementById('share-btn').addEventListener('click', shareNews);
-    }
-
-    function uploadImage() {
-      if (!imageFile) return Promise.resolve('');
-      
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result.split(',')[1];
-          const url = `${scriptUrl}?upload=image`;
-          fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({ image: base64, name: imageFile.name })
-          })
-          .then(r => r.json())
-          .then(data => resolve(data.url || ''))
-          .catch(reject);
-        };
-        reader.readAsDataURL(imageFile);
       });
     }
 
@@ -156,6 +108,7 @@
       const target = document.getElementById('target-select').value;
       const title = document.getElementById('title-input').value.trim();
       const content = document.getElementById('content-input').value.trim();
+      const announcer = document.getElementById('announcer-input').value.trim() || 'ไม่ระบุ';
 
       if (!target || !title || !content) {
         Swal.fire('กรุณากรอกข้อมูล', 'โปรดระบุ กลุ่มเป้าหมาย หัวข้อ และเนื้อหา', 'warning');
@@ -163,46 +116,34 @@
       }
 
       $.LoadingOverlay("show");
-      try {
-        const imageUrl = await uploadImage();
-        const payload = { target, title, content, imageUrl };
+      const payload = { target, title, content, announcer };
 
-        $.post(scriptUrl, JSON.stringify(payload), res => {
-          $.LoadingOverlay("hide");
-          if (res.status === 'success') {
-            newsData = payload;
-            document.getElementById('share-btn').disabled = false;
-
-            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว กำลังส่ง Flex Message อัตโนมัติ...', 'success')
-              .then(() => {
-                // ส่ง Flex Message อัตโนมัติหลังบันทึก
-                shareNews();
-              });
-
-            // รีเซ็ตฟอร์มหลังส่งเสร็จ
-            document.getElementById('news-form').reset();
-            document.getElementById('preview').style.display = 'none';
-            imageFile = null;
-          } else {
-            Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
-          }
-        }).fail(() => {
-          $.LoadingOverlay("hide");
-          Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
-        });
-      } catch (err) {
+      $.post(scriptUrl, JSON.stringify(payload), res => {
         $.LoadingOverlay("hide");
-        Swal.fire('ผิดพลาด', 'อัปโหลดรูปภาพล้มเหลว', 'error');
-      }
+        if (res.status === 'success') {
+          newsData = payload;
+
+          Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว กำลังส่ง Flex Message อัตโนมัติ...', 'success')
+            .then(() => {
+              shareNews(); // ส่งอัตโนมัติ
+            });
+
+          // รีเซ็ตฟอร์ม
+          document.getElementById('news-form').reset();
+          document.getElementById('announcer-input').value = 'ครูนำพล สาสิงห์';
+        } else {
+          Swal.fire('ผิดพลาด', 'บันทึกไม่สำเร็จ', 'error');
+        }
+      }).fail(() => {
+        $.LoadingOverlay("hide");
+        Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
+      });
     }
 
     function shareNews() {
-      if (!newsData) {
-        Swal.fire('ยังไม่ได้บันทึก', 'กรุณากด "บันทึกข้อมูล" ก่อนแชร์', 'warning');
-        return;
-      }
+      if (!newsData) return;
 
-      const { target, title, content, imageUrl } = newsData;
+      const { target, title, content, announcer } = newsData;
       const now = new Date();
       const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -227,11 +168,9 @@
             contents: [
               { type: 'separator', margin: 'lg' },
               { type: 'text', text: content, size: 'md', color: '#333333', margin: 'lg', wrap: true },
-              ...(imageUrl ? [
-                { type: 'image', url: imageUrl, size: 'full', aspectRatio: '3:2', aspectMode: 'cover', margin: 'lg' }
-              ] : []),
               { type: 'separator', margin: 'lg' },
-              { type: 'text', text: `วันที่: ${dateStr}`, size: 'sm', color: '#888888', align: 'end', margin: 'md' }
+              { type: 'text', text: `ประกาศโดย: ${announcer}`, size: 'sm', color: '#1a73e8', weight: 'bold', align: 'end', margin: 'sm' },
+              { type: 'text', text: `วันที่: ${dateStr}`, size: 'sm', color: '#888888', align: 'end', margin: 'sm' }
             ]
           },
           footer: {
@@ -253,7 +192,7 @@
     }
   </script>
   <footer>
-    <p>พัฒนาโดย ครูนำพล สาสิงห์2 | @NumpolSasing</p>
+    <p>พัฒนาโดย ครูนำพล สาสิงห์ | @NumpolSasing</p>
   </footer>
 </body>
 </html>
