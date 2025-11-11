@@ -25,7 +25,7 @@
 </head>
 <body>
   <div class="text-center mb-4 text-white">
-    <h2>ประกาศข่าวสาร</h2>
+    <h2><i class="fas fa-bullhorn"></i> ประกาศข่าวสาร</h2>
     <h5>โรงเรียนบ้านหนองขุ่น</h5>
   </div>
 
@@ -73,10 +73,10 @@
         <!-- ปุ่ม -->
         <div class="d-grid gap-2">
           <button type="button" id="save-btn" class="btn btn-primary btn-lg">
-            บันทึกข้อมูล
+            <i class="fas fa-save"></i> บันทึกข้อมูล
           </button>
           <button type="button" id="share-btn" class="btn btn-success btn-lg" disabled>
-            แชร์ผ่าน LINE
+            <i class="fab fa-line"></i> แชร์ผ่าน LINE
           </button>
         </div>
       </form>
@@ -86,9 +86,8 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbz6FewGN1P6K4B_goPUJoM56f0yfLvZYhZQ2HYvlyi9ALCc6dZ9EYPSdCg7tzGKiQAd/exec'; // เปลี่ยนตาม URL จริง
-    const ADMIN_PASSWORD = '123456'; // เปลี่ยนรหัสผ่าน
-
-    let newsData = null; // เก็บข้อมูลหลังบันทึก
+    const ADMIN_PASSWORD = '123456';
+    let newsData = null;
     let imageFile = null;
 
     window.onload = () => {
@@ -133,7 +132,6 @@
       document.getElementById('share-btn').addEventListener('click', shareNews);
     }
 
-    // อัปโหลดรูปภาพ (ถ้ามี)
     function uploadImage() {
       if (!imageFile) return Promise.resolve('');
       
@@ -154,7 +152,6 @@
       });
     }
 
-    // บันทึกข้อมูล
     async function saveNews() {
       const target = document.getElementById('target-select').value;
       const title = document.getElementById('title-input').value.trim();
@@ -173,19 +170,16 @@
         $.post(scriptUrl, JSON.stringify(payload), res => {
           $.LoadingOverlay("hide");
           if (res.status === 'success') {
-            // บันทึกสำเร็จ → เก็บข้อมูล + เปิดปุ่มแชร์
             newsData = payload;
             document.getElementById('share-btn').disabled = false;
-            document.getElementById('share-btn').innerHTML = 'แชร์ผ่าน LINE';
 
-            Swal.fire({
-              title: 'สำเร็จ!',
-              text: 'บันทึกข้อมูลเรียบร้อยแล้ว สามารถแชร์ได้เลย',
-              icon: 'success',
-              confirmButtonText: 'ตกลง'
-            });
+            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว กำลังส่ง Flex Message อัตโนมัติ...', 'success')
+              .then(() => {
+                // ส่ง Flex Message อัตโนมัติหลังบันทึก
+                shareNews();
+              });
 
-            // รีเซ็ตฟอร์ม
+            // รีเซ็ตฟอร์มหลังส่งเสร็จ
             document.getElementById('news-form').reset();
             document.getElementById('preview').style.display = 'none';
             imageFile = null;
@@ -202,7 +196,6 @@
       }
     }
 
-    // แชร์ Flex Message
     function shareNews() {
       if (!newsData) {
         Swal.fire('ยังไม่ได้บันทึก', 'กรุณากด "บันทึกข้อมูล" ก่อนแชร์', 'warning');
@@ -260,7 +253,7 @@
     }
   </script>
   <footer>
-    <p>พัฒนาโดย ครูนำพล สาสิงห์1 | @NumpolSasing</p>
+    <p>พัฒนาโดย ครูนำพล สาสิงห์ | @NumpolSasing</p>
   </footer>
 </body>
 </html>
